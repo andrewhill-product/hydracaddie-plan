@@ -9,11 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        "hc-green": "#00704A",
+        "hc-green-dark": "#005a3b",
+        "hc-bg": "#FAFAFA",
+        "hc-offwhite": "#FCFCFC",
+        "hc-black": "#020912",
       },
     },
   },
   plugins: [],
 };
+
 export default config;

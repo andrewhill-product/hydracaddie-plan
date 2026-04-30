@@ -1,101 +1,121 @@
 import Image from "next/image";
 
+const G = {
+  green: "#1A7A3C",
+  greenDark: "#155F2E",
+  greenMid: "#2A9B52",
+  greenLight: "#EAF4EE",
+  cream: "#FAFAF8",
+  white: "#FFFFFF",
+  text: "#141414",
+  muted: "#6B7280",
+  border: "#E2E8E4",
+};
+
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div style={{ maxWidth: 430, margin: "0 auto", minHeight: "100vh", background: G.white }}>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+      {/* Green gradient hero */}
+      <div style={{
+        background: `linear-gradient(170deg, ${G.greenDark} 0%, ${G.green} 60%, ${G.greenMid} 100%)`,
+        padding: "52px 28px 56px",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{ position: "absolute", top: -60, right: -60, width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
+        <div style={{ position: "absolute", bottom: -40, left: -30, width: 150, height: 150, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
+
+        <div style={{ position: "relative", zIndex: 1 }}>
+
+          {/* Logo */}
+          <div style={{ marginBottom: 40 }}>
             <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="/hydracaddie-logo.png"
+              alt="Hydracaddie"
+              width={260}
+              height={60}
+              priority
+              style={{ filter: "brightness(0) invert(1)", opacity: 0.92, maxWidth: "100%" }}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
+
+          {/* Headline */}
+          <h1 style={{ fontSize: 34, fontWeight: 900, color: "#fff", lineHeight: 1.15, letterSpacing: "-0.5px", marginBottom: 16 }}>
+            Your personal<br />round hydration<br />plan
+          </h1>
+
+          {/* Subhead */}
+          <p style={{ color: "rgba(255,255,255,0.82)", fontSize: 15.5, lineHeight: 1.55, maxWidth: 300 }}>
+            60 seconds. Built on the Galpin equation. Tells you exactly how much to drink across your round.
+          </p>
+
+          {/* Divider + why hydration matters */}
+          <div style={{ marginTop: 28, paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.15)" }}>
+            <p style={{ color: "rgba(255,255,255,0.68)", fontSize: 13, lineHeight: 1.65, fontWeight: 600 }}>
+              Just 1-3% body water loss can cut exercise capacity by around 10%. Most golfers play under-hydrated. The Galpin equation tells you exactly what your body needs, based on you and your round.
+            </p>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      {/* White section below hero */}
+      <div style={{ padding: "36px 28px 40px", display: "flex", flexDirection: "column", gap: 28 }}>
+
+        {/* Social proof */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex" }}>
+            {["#b0d4bc", "#88bc9a", "#60a47a"].map((c, i) => (
+              <div key={i} style={{
+                width: 32, height: 32, borderRadius: "50%", background: c,
+                border: "2px solid #fff", marginLeft: i ? -8 : 0,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 13,
+              }}>
+                ⛳
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 13.5, color: G.muted, fontWeight: 600 }}>
+            Used by <strong style={{ color: G.text }}>2,400+</strong> golfers
+          </p>
+        </div>
+
+        {/* Feature pills */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {[
+            { icon: "⚡", text: "Takes under 60 seconds" },
+            { icon: "🔬", text: "Based on the Galpin equation" },
+            { icon: "🎯", text: "Personalised to your round" },
+          ].map(({ icon, text }) => (
+            <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10, background: G.greenLight,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 18, flexShrink: 0,
+              }}>{icon}</div>
+              <span style={{ fontSize: 15, fontWeight: 600, color: G.text }}>{text}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div>
+          <button style={{
+            display: "block", width: "100%", border: "none",
+            cursor: "pointer", fontFamily: "Nunito, sans-serif",
+            fontWeight: 800, fontSize: 18,
+            borderRadius: 50, padding: "16px 24px",
+            background: G.green, color: "#fff",
+          }}>
+            Start your plan
+          </button>
+          <p style={{ textAlign: "center", fontSize: 12.5, color: G.muted, marginTop: 12, fontWeight: 600 }}>
+            Free. No account needed.
+          </p>
+        </div>
+
+      </div>
     </div>
   );
 }
