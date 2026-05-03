@@ -377,7 +377,7 @@ export default function QuizStepper() {
           </div>
         </div>
 
-        {/* I don't have one yet */}
+        {/* I don&apos;t have one yet */}
         <button
           onClick={() => handleAnswer('handicap', 'none')}
           style={{
@@ -394,7 +394,7 @@ export default function QuizStepper() {
             marginTop: 4,
           }}
         >
-          I don't have one yet
+          I don&apos;t have one yet
         </button>
 
         {/* Confirm button */}
