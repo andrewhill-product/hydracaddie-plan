@@ -101,7 +101,7 @@ export default function EmailCapture({ answers, onSuccess, onBack }: Props) {
           Where shall we send your plan?
         </h1>
         <p style={{ fontSize: 15, color: G.muted, lineHeight: 1.55, marginBottom: 28 }}>
-          Your plan is ready. We'll email it over and add a free golf hydration guide.
+        Your plan is ready. We&apos;ll email it over and add a free golf hydration guide.
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
