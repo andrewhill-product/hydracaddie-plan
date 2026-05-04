@@ -156,13 +156,14 @@ export default function QuizStepper({
   answers,
   setAnswers,
   onComplete,
+  initialStep = 0,
 }: {
   answers: PartialAnswers
   setAnswers: React.Dispatch<React.SetStateAction<PartialAnswers>>
-  onComplete: () => void // called when Q7 is answered, moves to email screen
+  onComplete: () => void
+  initialStep?: number // which question to start from when remounting (default Q1)
 }) {
-
- const [step, setStep]       = useState(0)
+  const [step, setStep] = useState(initialStep)
   const [sliderVal, setSliderVal] = useState(18) // default slider position
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg')
 

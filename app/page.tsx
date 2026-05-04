@@ -32,6 +32,7 @@ export default function Home() {
 
   // Quiz answers accumulate as the user progresses
   const [answers, setAnswers] = useState<PartialAnswers>({})
+const [quizStartStep, setQuizStartStep] = useState(0) // which Q to return to if user goes back from email
 
   
 
@@ -46,14 +47,14 @@ export default function Home() {
     <EmailCapture
   answers={answers as QuizAnswers}
   onSuccess={() => setStep('results')}
-  onBack={() => setStep('quiz')}
+  onBack={() => { setQuizStartStep(6); setStep('quiz'); }}
 />
     )
   }
 
   // Show quiz once started
   if (step === 'quiz') {
-   return <QuizStepper answers={answers} setAnswers={setAnswers} onComplete={() => setStep('email')} />
+  return <QuizStepper answers={answers} setAnswers={setAnswers} onComplete={() => setStep('email')} initialStep={quizStartStep} />
   }
 
   // Default: landing page
