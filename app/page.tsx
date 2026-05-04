@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import QuizStepper from './components/QuizStepper'
+import Results from './components/Results'
+import type { QuizAnswers } from '../lib/types'
+
+type PartialAnswers = Partial<QuizAnswers>
 
 const G = {
   green:      '#1A7A3C',
@@ -19,10 +23,16 @@ const G = {
 export default function Home() {
 
   const [started, setStarted] = useState(false)
+  const [answers, setAnswers] = useState<PartialAnswers>({})
 
-  // If the user has clicked "Start your plan", show the quiz.
+  // Quiz complete: all 7 answers present, including handicap (Q7, the last question).
+  if (started && answers.handicap !== undefined) {
+    return <Results answers={answers as QuizAnswers} />
+  }
+
+  // Quiz in progress.
   if (started) {
-    return <QuizStepper />
+    return <QuizStepper answers={answers} setAnswers={setAnswers} />
   }
 
   // Otherwise show the landing page.

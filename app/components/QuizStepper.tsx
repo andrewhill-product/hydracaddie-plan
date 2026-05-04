@@ -152,10 +152,15 @@ function QuestionScreen({
   )
 }
 
-export default function QuizStepper() {
+export default function QuizStepper({
+  answers,
+  setAnswers,
+}: {
+  answers: PartialAnswers
+  setAnswers: React.Dispatch<React.SetStateAction<PartialAnswers>>
+}) {
 
-  const [step, setStep]       = useState(0)
-  const [answers, setAnswers] = useState<PartialAnswers>({})
+ const [step, setStep]       = useState(0)
   const [sliderVal, setSliderVal] = useState(18) // default slider position
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg')
 
@@ -420,15 +425,5 @@ export default function QuizStepper() {
     )
   }
 
-  // All 7 done. Placeholder until results page in 3c.
-  return (
-    <div style={{ maxWidth: 430, margin: '0 auto', minHeight: '100vh', background: G.white, padding: '40px 24px' }}>
-      <h2 style={{ fontSize: 26, fontWeight: 900, color: G.text, marginBottom: 16 }}>
-        All done.
-      </h2>
-      <p style={{ color: G.muted, fontSize: 15 }}>
-        Holes: {answers.holes}, Mode: {answers.mode}, Duration: {answers.duration}, Climate: {answers.climate}, Sweat: {answers.sweat}, Weight: {answers.weight}, Handicap: {answers.handicap}
-      </p>
-    </div>
-  )
+  return null
 }
