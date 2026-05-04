@@ -155,9 +155,11 @@ function QuestionScreen({
 export default function QuizStepper({
   answers,
   setAnswers,
+  onComplete,
 }: {
   answers: PartialAnswers
   setAnswers: React.Dispatch<React.SetStateAction<PartialAnswers>>
+  onComplete: () => void // called when Q7 is answered, moves to email screen
 }) {
 
  const [step, setStep]       = useState(0)
@@ -384,7 +386,7 @@ export default function QuizStepper({
 
         {/* I don&apos;t have one yet */}
         <button
-          onClick={() => handleAnswer('handicap', 'none')}
+         onClick={() => { setAnswers(prev => ({ ...prev, handicap: 'none' })); onComplete(); }}
           style={{
             width: '100%',
             padding: '18px 20px',
@@ -404,7 +406,7 @@ export default function QuizStepper({
 
         {/* Confirm button */}
         <button
-          onClick={() => handleAnswer('handicap', handicapBucket)}
+         onClick={() => { setAnswers(prev => ({ ...prev, handicap: handicapBucket })); onComplete(); }}
           style={{
             width: '100%',
             padding: '18px 20px',

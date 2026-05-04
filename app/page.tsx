@@ -4,9 +4,14 @@ import { useState } from 'react'
 import Image from 'next/image'
 import QuizStepper from './components/QuizStepper'
 import Results from './components/Results'
+import EmailCapture from './components/EmailCapture'
 import type { QuizAnswers } from '../lib/types'
 
+// Partial answers while the quiz is in progress (not all 7 yet)
 type PartialAnswers = Partial<QuizAnswers>
+
+// The four screens the tool can show, in order
+type Step = 'landing' | 'quiz' | 'email' | 'results'
 
 const G = {
   green:      '#1A7A3C',
@@ -22,20 +27,36 @@ const G = {
 
 export default function Home() {
 
-  const [started, setStarted] = useState(false)
+  // Which screen are we on?
+  const [step, setStep] = useState<Step>('landing')
+
+  // Quiz answers accumulate as the user progresses
   const [answers, setAnswers] = useState<PartialAnswers>({})
 
-  // Quiz complete: all 7 answers present, including handicap (Q7, the last question).
-  if (started && answers.handicap !== undefined) {
+  
+
+  // Show results after email is submitted
+  if (step === 'results') {
     return <Results answers={answers as QuizAnswers} />
   }
 
-  // Quiz in progress.
-  if (started) {
-    return <QuizStepper answers={answers} setAnswers={setAnswers} />
+  // Show email capture between quiz and results
+  if (step === 'email') {
+    return (
+    <EmailCapture
+  answers={answers as QuizAnswers}
+  onSuccess={() => setStep('results')}
+  onBack={() => setStep('quiz')}
+/>
+    )
   }
 
-  // Otherwise show the landing page.
+  // Show quiz once started
+  if (step === 'quiz') {
+   return <QuizStepper answers={answers} setAnswers={setAnswers} onComplete={() => setStep('email')} />
+  }
+
+  // Default: landing page
   return (
     <div style={{ maxWidth: 430, margin: '0 auto', minHeight: '100vh', background: G.white }}>
 
@@ -45,6 +66,7 @@ export default function Home() {
         position: 'relative',
         overflow: 'hidden',
       }}>
+        {/* Decorative circles in the hero background */}
         <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
         <div style={{ position: 'absolute', bottom: -40, left: -30, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
 
@@ -115,8 +137,9 @@ export default function Home() {
         </div>
 
         <div>
+          {/* Clicking Start moves us from landing to quiz */}
           <button
-            onClick={() => setStarted(true)}
+            onClick={() => setStep('quiz')}
             style={{
               display: 'block', width: '100%', border: 'none',
               cursor: 'pointer', fontFamily: 'Nunito, sans-serif',
