@@ -191,23 +191,15 @@ Checkpoint timeline is the hero element of the results page. Designed to be scre
 16. Worked example uses bucket midpoint, not raw user weight. 85kg is the midpoint of the 80-90kg bucket and produces 1,350ml.
 
 Current state
-Status: Pre-development. Brief, design and architecture defined. Claude Design prototype signed off by Ross. No code written yet.
+Status: v1 shipped, 4 May 2026. Full flow live on Vercel: landing, 7-step quiz, email capture (Formspree), results page with checkpoint timeline and UTM CTA. Privacy Policy and Terms of Service links live. Back button working across all screens.
 
-Next session goals (Session 1):
-
-Scaffold Next.js 14 project with TypeScript and Tailwind
-Git init and first commit
-Basic landing page (hero only, no quiz yet)
-Andy understands the folder structure and runs the dev server locally
-Push to GitHub, connect to Vercel, get a live URL
-
-Rough session plan:
-
-Session 1: Scaffold, landing page, git basics, deploy
-Session 2: Quiz stepper UI and state management (7 steps)
-Session 3: Calc engine, 
-Session 4: results page, checkpoint timeline
-Session 4: Email capture wiring, brand polish, UTM links, final deploy
+Outstanding placeholders for v2:
+- Social proof number (currently hardcoded 2,400+) — confirm with Ross
+- Sachet composition (real Na/K/Mg mg per sachet) — confirm with Ross
+- Slider UX improvement on mobile
+- Custom domain (plan.hydracaddie.com)
+- Analytics (Meta Pixel, Google Analytics, cookie consent)
+- Social media engagement dashboard (separate mini project)
 How to work with this codebase
 Running locally
 npm run dev # starts the dev server at localhost:3000
