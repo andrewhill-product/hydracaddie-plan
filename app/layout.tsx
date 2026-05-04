@@ -8,8 +8,25 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Hydracaddie Hydration Plan",
-  description: "Your personal round hydration plan. Built on the Galpin equation.",
+  // Browser tab title
+  title: "Your personal round hydration plan | Hydracaddie",
+  description: "Personalised round hydration plan for golfers. Built on the Galpin equation.",
+  openGraph: {
+    // What shows when someone shares the link on WhatsApp, Twitter, LinkedIn etc.
+    title: "Your personal round hydration plan",
+    description: "Personalised round hydration plan for golfers. Built on the Galpin equation.",
+    url: "https://hydracaddie-plan.vercel.app",
+    siteName: "Hydracaddie",
+    images: [{ url: "/hydracaddie-logo.png", width: 260, height: 60 }],
+    locale: "en_GB",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Your personal round hydration plan",
+    description: "Personalised round hydration plan for golfers. Built on the Galpin equation.",
+    images: ["/hydracaddie-logo.png"],
+  },
 };
 
 export default function RootLayout({
@@ -18,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en-GB">
       <body className={nunito.className}>{children}</body>
     </html>
   );
