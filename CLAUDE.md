@@ -92,9 +92,9 @@ Soaked through, often: 1.25
 Sachet recommendation
 One sachet per round is the brand position. Do not display a "sachets recommended" card. Do not vary the sachet count. The hydration plan is the output, the sachet is the answer, full stop.
 Worked example (for reference, not for hard-coded output)
-80kg golfer (uses 75kg midpoint from the 70-80kg bucket... actually for the worked example we use 80kg explicitly to match the design copy), walking 18 holes over 4 hours on a warm UK day, moderate sweat:
+85kg golfer (midpoint of the 80-90kg bucket), walking 18 holes over 4 hours on a warm UK day, damp shirt sweat:
 
-Base Galpin: 80kg x 2ml x 4 blocks/hr x 4hr = 2,560ml
+Base Galpin: 85kg x 2ml x 4 blocks/hr x 4hr = 2,720ml
 Golf walking 0.35: 896ml
 Warm 1.4: 1,254ml
 Sweat 1.0 (damp shirt): 1,254ml
@@ -130,7 +130,7 @@ Each checkpoint has a small icon (golf flag, tee, halfway house, clubhouse) for 
 "Mode of play: walking burns more energy than riding in a buggy."
 "Climate: hotter conditions raise sweat rate."
 "Self-reported sweat rate: a personal multiplier on top of the climate adjustment."
-"Worked example: an 80kg golfer walking 18 holes over 4 hours on a warm UK day with moderate sweat needs around 1,250ml of fluid across the round."
+"Worked example: an 85kg golfer (in the 80-90kg bucket) walking 18 holes over 4 hours on a warm UK day with damp shirt sweat needs around 1,350ml of fluid across the round."
 "Galpin's formula was originally calibrated for running. We apply a golf-specific intensity multiplier to account for the lower energy demand of a round."
 "Want to read the science? See Fallowfield et al. (1996), 'Effect of water ingestion on endurance capacity during prolonged running', Journal of Sports Sciences, 14(6), 497-502. https://www.tandfonline.com/doi/abs/10.1080/02640419608727736"
 Coding conventions
@@ -185,7 +185,10 @@ Client-side calc only in v1. No server, no database, no external API calls beyon
 9 or 18 holes only. 27 and 36 hole options removed from the quiz
 Handicap (Q7) is data-only. Captured for customer insight, does not affect the calc
 Checkpoint timeline is the hero element of the results page. Designed to be screenshot-worthy and shareable on Instagram and TikTok
-Scalability by default. Lookup tables over hardcoded logic. New options require one line added to config, not edits to branching logic. Do not sacrifice clarity for scalability: if a lookup table makes something harder to read, document it clearly with a comment.
+13. Scalability by default.
+14. v1 uses inline styles, not Tailwind utilities. Sessions 1 to 3 silently bypassed the original Tailwind-only convention. Refactor to Tailwind is deferred to v2. Brand colours live in the local G const in app/page.tsx and app/components/QuizStepper.tsx.
+15. Brand greens in use: #1A7A3C (primary), #155F2E (dark), #2A9B52 (mid), #EAF4EE (light tint). Update tailwind.config.ts to match in v2 refactor.
+16. Worked example uses bucket midpoint, not raw user weight. 85kg is the midpoint of the 80-90kg bucket and produces 1,350ml.
 
 Current state
 Status: Pre-development. Brief, design and architecture defined. Claude Design prototype signed off by Ross. No code written yet.
