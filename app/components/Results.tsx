@@ -63,37 +63,45 @@ type Checkpoint = {
   body: string
 }
 
-// Checkpoint copy locked in CLAUDE.md. Do not edit without updating CLAUDE.md first.
-const CHECKPOINTS_18: Checkpoint[] = [
-  {
-    emoji:    '🏠',
-    label:    'Pre-round',
-    subtitle: 'Before the first tee',
-    action:   'Mix one sachet in 500ml water',
-    body:     'Drink half before you head out, save the rest for the front nine. Pre-hydrating primes your electrolyte levels and stops the back-nine fade before it starts.',
-  },
-  {
-    emoji:    '⛳',
-    label:    'Front 9',
-    subtitle: 'Holes 1 to 9',
-    action:   'Sip every 2-3 holes',
-    body:     'Aim to finish the rest of your sachet by the turn. Steady sipping beats big gulps for absorption.',
-  },
-  {
-    emoji:    '🔄',
-    label:    'Back 9',
-    subtitle: 'Holes 10 to 18',
-    action:   'Top up with plain water',
-    body:     'Sip every 2-3 holes again. The electrolytes from your sachet will keep working through the back nine.',
-  },
-  {
-    emoji:    '🏆',
-    label:    'Post-round',
-    subtitle: 'After the 18th',
-    action:   '500ml plain water in the clubhouse',
-    body:     'Replaces what you have lost and helps recovery for tomorrow.',
-  },
-]
+// Splits the calc total evenly across Front 9 and Back 9 so they sum to totalFluidMl.
+// Front 9 is rounded to nearest 50ml; Back 9 takes the remainder to preserve the total.
+// Post-round uses the 150% rehydration rule: replace 1.5x sweat loss after exercise.
+function buildCheckpoints18(totalFluidMl: number): Checkpoint[] {
+  const front9Ml    = Math.round(totalFluidMl / 2 / 50) * 50
+  const back9Ml     = totalFluidMl - front9Ml
+  const postRoundMl = Math.round(totalFluidMl * 1.5 / 50) * 50
+
+  return [
+    {
+      emoji:    '🏠',
+      label:    'Pre-round',
+      subtitle: 'Before the first tee',
+      action:   'Mix one sachet in 500ml water',
+      body:     'Start sipping 2 hours before your tee time, not on the first tee. Drink half your sachet in the build-up to your round and save the rest for the front nine. Getting ahead of your fluid needs before hole one is the easiest win in golf hydration.',
+    },
+    {
+      emoji:    '⛳',
+      label:    'Front 9',
+      subtitle: 'Holes 1 to 9',
+      action:   `Aim for ${front9Ml}ml by the turn`,
+      body:     'Sip your sachet every 2-3 holes, topping up with plain water as needed. Steady sipping beats big gulps for absorption.',
+    },
+    {
+      emoji:    '⛳',
+      label:    'Back 9',
+      subtitle: 'Holes 10 to 18',
+      action:   `Top up with ${back9Ml}ml of plain water`,
+      body:     'Sip every 2-3 holes. The electrolytes from your sachet will keep working through the back nine.',
+    },
+    {
+      emoji:    '🏆',
+      label:    'Post-round',
+      subtitle: 'After the 18th',
+      action:   `${postRoundMl}ml plain water in the clubhouse`,
+      body:     `Sports science recommends replacing 150% of fluid lost after exercise to fully rehydrate. Based on your estimated sweat loss of ${totalFluidMl}ml, aim for ${postRoundMl}ml before you head home.`,
+    },
+  ]
+}
 
 const CHECKPOINTS_9: Checkpoint[] = [
   {
@@ -101,7 +109,7 @@ const CHECKPOINTS_9: Checkpoint[] = [
     label:    'Pre-round',
     subtitle: 'Before the first tee',
     action:   'Mix one sachet in 500ml water',
-    body:     'Drink half before you tee off.',
+    body:     'Start sipping 2 hours before your tee time. Drink half your sachet in the build-up and save the rest for the course.',
   },
   {
     emoji:    '⛳',
@@ -119,19 +127,14 @@ const CHECKPOINTS_9: Checkpoint[] = [
   },
 ]
 
-// Adding a new hole count in future = add one line here.
-const CHECKPOINTS_BY_HOLES: Record<number, Checkpoint[]> = {
-  9:  CHECKPOINTS_9,
-  18: CHECKPOINTS_18,
-}
 
-const PRODUCT_URL = 'https://www.hydracaddie.com?utm_source=hydration_plan&utm_medium=tool&utm_campaign=v1_launch'
+const PRODUCT_URL = 'https://www.hydracaddie.com/collections/electrolyte-powder?utm_source=hydration_plan&utm_medium=tool&utm_campaign=v1_launch'
 
 export default function Results({ answers }: { answers: QuizAnswers }) {
 
   const plan = useMemo(() => calculateHydrationPlan(answers), [answers])
   const totalFormatted = Intl.NumberFormat('en-GB').format(plan.totalFluidMl)
-  const checkpoints = CHECKPOINTS_BY_HOLES[answers.holes] ?? CHECKPOINTS_18
+  const checkpoints = answers.holes === 9 ? CHECKPOINTS_9 : buildCheckpoints18(plan.totalFluidMl)
 
   // Both accordions closed by default.
   const [timelineOpen, setTimelineOpen] = useState(false)
@@ -181,6 +184,9 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
           <p style={{ fontSize: 52, fontWeight: 900, color: G.green, lineHeight: 1, margin: 0 }}>
             {totalFormatted}
             <span style={{ fontSize: 22, fontWeight: 700, marginLeft: 4 }}>ml</span>
+          </p>
+          <p style={{ fontSize: 13, fontWeight: 600, color: G.muted, lineHeight: 1.5, marginTop: 12 }}>
+            Your estimated sweat loss during the round. Your full drinking plan is below.
           </p>
         </div>
 

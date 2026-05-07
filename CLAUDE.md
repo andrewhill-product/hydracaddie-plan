@@ -189,6 +189,37 @@ Checkpoint timeline is the hero element of the results page. Designed to be scre
 14. v1 uses inline styles, not Tailwind utilities. Sessions 1 to 3 silently bypassed the original Tailwind-only convention. Refactor to Tailwind is deferred to v2. Brand colours live in the local G const in app/page.tsx and app/components/QuizStepper.tsx.
 15. Brand greens in use: #1A7A3C (primary), #155F2E (dark), #2A9B52 (mid), #EAF4EE (light tint). Update tailwind.config.ts to match in v2 refactor.
 16. Worked example uses bucket midpoint, not raw user weight. 85kg is the midpoint of the 80-90kg bucket and produces 1,350ml.
+17. Post-round rehydration uses the 150% rule (1.5x sweat loss), confirmed by golf-specific sports science literature (O'Donnell et al., 2024; ACSM, 2007).
+18. OPEN QUESTION for Ross: the walking intensity multiplier (0.35) may be too aggressive. Golf-specific research (O'Donnell et al., 2024) recommends 150ml per 15 minutes on-course regardless of body weight, which for a 4-hour round implies 2,400ml before climate and sweat adjustments. Our Galpin-adjusted figure for a typical walking golfer is approximately 1,350ml. The gap suggests our multiplier could be revised upward. Do not change the multiplier without Ross sign-off. The value lives in INTENSITY in lib/calculateHydrationPlan.ts.
+
+Golf hydration research references
+The following peer-reviewed sources were reviewed in session 7 (May 2026) and inform the calc logic and checkpoint copy. Use these as the reference baseline when Ross reviews the multipliers.
+
+On-course hydration
+- O'Donnell, A., Murray, A., Nguyen, A., Salmon, T., Taylor, S., Morton, J. P., & Close, G. L. (2024). Nutrition and Golf Performance: A Systematic Scoping Review. Sports Medicine, 1-15.
+  Key finding: 150ml per 15 minutes on-course; keep fluid loss below 1% of body weight.
+- O'Donnell, A., Dunne, D., Close, G. L. (2023). Nutrition, Hydration and Golf. Aspetar Sports Medicine Journal. 12. https://journal.aspetar.com/en/archive/volume-12-targeted-topic-sports-medicine-in-golf/nutrition-hydration-and-golf
+- Berlin, N., Cooke, M. B., & Belski, R. (2023). Nutritional considerations for elite golf: A narrative review. Nutrients, 15(19), 4116.
+- Smith, M. F., Newell, A. J., & Baker, M. R. (2012). Effect of acute mild dehydration on cognitive-motor performance in golf. Journal of Strength and Conditioning Research, 26(11), 3075-3080.
+- Stevenson, W., Zabinsky, J. S., & Hedrick, V. E. (2019). Effects of Dehydration on Cognitive and Physical Performance in Female Golfers: A Randomized Crossover Pilot Study. J, 2(4), 496-507.
+
+Post-round rehydration
+- American College of Sports Medicine (2007). Exercise and fluid replacement. Med Sci Sports Exerc, 39(2), 377-90.
+  Key finding: replace 1.5x fluid lost post-exercise. Confirms our 150% post-round rule.
+- Maughan, R. J., et al. (2016). A randomized trial to assess the potential of different beverages to affect hydration status: development of a beverage hydration index. American Journal of Clinical Nutrition, 103(3).
+
+Electrolytes and cognitive performance
+- Stevenson, E. J., Hayes, P. R., & Allison, S. J. (2009). The effect of a carbohydrate-caffeine sports drink on simulated golf performance. Applied physiology, nutrition, and metabolism, 34(4), 681-688.
+- Thompsett, D. J., Vento, K.A., Der Ananian, C., Hondula, D., Wardenaar, F. C. (2022). The effects of three different types of macronutrient feedings on golf performance and levels of fatigue and alertness. Nutrition and Health, 28(4), 509-14.
+- Riebl, S. K., & Davy, B. M. (2013). The Hydration Equation: Update on Water Balance and Cognitive Performance. ACSM's health and fitness journal, 17(6), 21-28.
+- Savoie, F. A., et al. (2015). Effect of Hypohydration on Muscle Endurance, Strength, Anaerobic Power and Capacity and Vertical Jumping Ability: A Meta-Analysis. Sports Medicine, 45(8), 1207-1227.
+
+Hydration monitoring
+- Gunawan, A., Brandon, D., Puspa, V., & Wiweko, B. (2018). Development of Urine Hydration System Based on Urine Color and Support Vector Machine. Procedia Computer Science, 135, 481-489.
+- Magee, P. J., Gallagher, A. M., & McCormack, J. M. (2017). High prevalence of dehydration and inadequate nutritional knowledge among university and club level athletes. Int J Sport Nutr Exerc Metab, 27(2), 158-68.
+
+Warm-up and performance context
+- Goswami, C. L., Shepherd, A. J., Langdown, B. L., Knight, J. M., & Maguire, A. J. (2025). Acute Effects of Different Warm-Up Protocols on Junior Golfers' Drive Performance. International Journal of Strength and Conditioning, 5(1). https://doi.org/10.47206/ijsc.v5i1.343
 
 Current state
 Status: v1 shipped, 4 May 2026. Full flow live on Vercel: landing, 7-step quiz, email capture (Formspree), results page with checkpoint timeline and UTM CTA. Privacy Policy and Terms of Service links live. Back button working across all screens.
