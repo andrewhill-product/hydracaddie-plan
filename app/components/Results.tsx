@@ -34,13 +34,15 @@ const DURATION_LABEL: Record<string, string> = {
   'not-sure': 'Not sure (average used)',
 }
 const CLIMATE_LABEL: Record<string, string> = {
-  cool: 'Cool (under 15C)',
-  mild: 'Mild (15-22C)',
-  warm: 'Warm (22-28C)',
-  hot:  'Hot (28C+)',
+  '0-10':  '0-10°C',
+  '11-15': '11-15°C',
+  '16-20': '16-20°C',
+  '21-25': '21-25°C',
+  '26+':   '26°C+',
 }
 const SWEAT_LABEL: Record<string, string> = {
   low:    'Barely break a sweat',
+  shower: "I'll need a shower after",
   medium: 'Damp shirt by the back nine',
   high:   'Soaked through, often',
 }
@@ -182,33 +184,6 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
           </p>
         </div>
 
-        {/* Card 2: Electrolytes */}
-        <div style={{
-          background: G.white,
-          border: `2px solid ${G.border}`,
-          borderRadius: 16,
-          padding: '28px 24px',
-          marginBottom: 24,
-        }}>
-          <p style={{ fontSize: 13, fontWeight: 700, color: G.muted, letterSpacing: 1, marginBottom: 20 }}>
-            ELECTROLYTES YOU&apos;LL LOSE
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 15, fontWeight: 700, color: G.text }}>Sodium</span>
-              <span style={{ fontSize: 15, fontWeight: 800, color: G.green }}>
-                {Intl.NumberFormat('en-GB').format(plan.sodiumRangeMg.min)}&ndash;{Intl.NumberFormat('en-GB').format(plan.sodiumRangeMg.max)}mg
-              </span>
-            </div>
-            <div style={{ height: 1, background: G.border }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 15, fontWeight: 700, color: G.text }}>Potassium</span>
-              <span style={{ fontSize: 15, fontWeight: 800, color: G.green }}>
-                {Intl.NumberFormat('en-GB').format(plan.potassiumRangeMg.min)}&ndash;{Intl.NumberFormat('en-GB').format(plan.potassiumRangeMg.max)}mg
-              </span>
-            </div>
-          </div>
-        </div>
 
         {/* Accordion 1: Timeline — green header, closed by default */}
         <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 16, border: `2px solid ${G.green}` }}>
@@ -378,7 +353,18 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
                   Galpin&apos;s formula was calibrated for running. We apply a golf-specific intensity multiplier to account for the lower energy demand of a round.
                 </p>
                 <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
-                  Source: Fallowfield et al. (1996), Effect of water ingestion on endurance capacity during prolonged running, Journal of Sports Sciences, 14(6), 497-502.
+                  This estimate is guidance. Please consult with a healthcare professional for personalised advice.
+                </p>
+                <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
+                  Source:{' '}
+                  <a
+                    href="https://www.tandfonline.com/doi/abs/10.1080/02640419608727736"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: G.green, textDecoration: 'underline' }}
+                  >
+                    Fallowfield et al. (1996), Effect of water ingestion on endurance capacity during prolonged running, Journal of Sports Sciences, 14(6), 497-502.
+                  </a>
                 </p>
               </div>
             </div>
@@ -407,6 +393,9 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
         </button>
         <p style={{ textAlign: 'center', fontSize: 12.5, color: G.muted, marginTop: 10, fontWeight: 600 }}>
           Free UK delivery over £15
+        </p>
+        <p style={{ textAlign: 'center', fontSize: 12.5, color: G.muted, marginTop: 16, fontWeight: 600, lineHeight: 1.5 }}>
+          We&apos;re working on emailing your personalised plan automatically. Coming soon.
         </p>
 
       </div>
