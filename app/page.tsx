@@ -63,7 +63,7 @@ const [quizStartStep, setQuizStartStep] = useState(0) // which Q to return to if
 
       <div style={{
         background: `linear-gradient(170deg, ${G.greenDark} 0%, ${G.green} 60%, ${G.greenMid} 100%)`,
-        padding: '52px 28px 56px',
+        padding: '32px 28px 36px',
         position: 'relative',
         overflow: 'hidden',
       }}>
@@ -73,7 +73,7 @@ const [quizStartStep, setQuizStartStep] = useState(0) // which Q to return to if
 
         <div style={{ position: 'relative', zIndex: 1 }}>
 
-          <div style={{ marginBottom: 40 }}>
+          <div style={{ marginBottom: 20 }}>
             <Image
               src='/hydracaddie-logo.png'
               alt='Hydracaddie'
@@ -85,22 +85,22 @@ const [quizStartStep, setQuizStartStep] = useState(0) // which Q to return to if
           </div>
 
           <h1 style={{ fontSize: 34, fontWeight: 900, color: '#fff', lineHeight: 1.15, letterSpacing: '-0.5px', marginBottom: 16 }}>
-            Your personal<br />round hydration<br />plan
+            Your personal hydration plan
           </h1>
 
           <p style={{ color: 'rgba(255,255,255,0.82)', fontSize: 15.5, lineHeight: 1.55, maxWidth: 300 }}>
-            60 seconds. Built on the Galpin equation. Tells you exactly how much to drink across your round.
+            Dehydration causes golfers to lose 93% of their accuracy and 12% of their distance.
           </p>
 
-          <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.15)' }}>
-            <p style={{ color: 'rgba(255,255,255,0.68)', fontSize: 13, lineHeight: 1.65, fontWeight: 600 }}>
-              Just 1-3% body water loss can cut exercise capacity by around 10%. Most golfers play under-hydrated. The Galpin equation tells you exactly what your body needs, based on you and your round.
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.15)' }}>
+            <p style={{ color: 'rgba(255,255,255,0.68)', fontSize: 13, lineHeight: 1.5, fontWeight: 600 }}>
+              Use our free tool based on The Galpin Equation that tells you how much to drink on the course.
             </p>
           </div>
         </div>
       </div>
 
-      <div style={{ padding: '36px 28px 40px', display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ padding: '20px 28px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ display: 'flex' }}>
@@ -116,7 +116,7 @@ const [quizStartStep, setQuizStartStep] = useState(0) // which Q to return to if
             ))}
           </div>
           <p style={{ fontSize: 13.5, color: G.muted, fontWeight: 600 }}>
-            Used by <strong style={{ color: G.text }}>2,400+</strong> golfers
+            Used by <strong style={{ color: G.text }}>150+</strong> golfers
           </p>
         </div>
 
