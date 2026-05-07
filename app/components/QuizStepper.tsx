@@ -230,10 +230,11 @@ export default function QuizStepper({
     return (
       <QuestionScreen step={4} question="What's the weather like when you usually play?" onBack={goBack}>
         {([
-          { emoji: '🧊', label: 'Cool (under 15C)', value: 'cool' },
-          { emoji: '🌤️', label: 'Mild (15-22C)',    value: 'mild' },
-          { emoji: '☀️', label: 'Warm (22-28C)',    value: 'warm' },
-          { emoji: '🔥', label: 'Hot (28C+)',        value: 'hot'  },
+          { emoji: '❄️',  label: '0-10°C',  value: '0-10'  },
+          { emoji: '🧊',  label: '11-15°C', value: '11-15' },
+          { emoji: '🌤️', label: '16-20°C', value: '16-20' },
+          { emoji: '☀️', label: '21-25°C', value: '21-25' },
+          { emoji: '🔥', label: '26°C+',   value: '26+'   },
         ] as { emoji: string; label: string; value: Climate }[]).map(({ emoji, label, value }) => (
           <OptionButton key={value} emoji={emoji} label={label} onClick={() => handleAnswer('climate', value)} isSelected={answers.climate === value} />
         ))}
@@ -247,6 +248,7 @@ export default function QuizStepper({
       <QuestionScreen step={5} question="How much do you typically sweat on the course?" onBack={goBack}>
         {([
           { emoji: '😎', label: 'Barely break a sweat',        value: 'low'    },
+          { emoji: '🚿', label: "I'll need a shower after",    value: 'shower' },
           { emoji: '💧', label: 'Damp shirt by the back nine', value: 'medium' },
           { emoji: '🥵', label: 'Soaked through, often',       value: 'high'   },
         ] as { emoji: string; label: string; value: SweatRate }[]).map(({ emoji, label, value }) => (

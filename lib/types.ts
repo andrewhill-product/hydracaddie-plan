@@ -10,9 +10,9 @@ export type ModeOfPlay = 'walking' | 'buggy'
 
 export type RoundDuration = '3h' | '4h' | '5h+' | 'not-sure'
 
-export type Climate = 'cool' | 'mild' | 'warm' | 'hot'
+export type Climate = '0-10' | '11-15' | '16-20' | '21-25' | '26+'
 
-export type SweatRate = 'low' | 'medium' | 'high'
+export type SweatRate = 'low' | 'shower' | 'medium' | 'high'
 
 export type WeightBucket =
   | 'under60'

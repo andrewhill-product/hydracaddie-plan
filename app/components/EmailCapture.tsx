@@ -58,7 +58,7 @@ export default function EmailCapture({ answers, onSuccess, onBack }: Props) {
   };
 
   const buttonLabel = {
-    idle:    'Send me my plan',
+    idle:    'See my plan',
     loading: 'Sending...',
     error:   'Something went wrong, try again',
     success: 'Sending...',
@@ -94,14 +94,14 @@ export default function EmailCapture({ answers, onSuccess, onBack }: Props) {
 
         {/* Mailbox icon */}
         <div style={{ width: 72, height: 72, borderRadius: 18, background: G.greenLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, marginBottom: 24 }}>
-          📬
+          🌿
         </div>
 
         <h1 style={{ fontSize: 30, fontWeight: 900, color: G.text, lineHeight: 1.15, marginBottom: 10 }}>
-          Where shall we send your plan?
+          Let&apos;s keep in touch, one last thing before your plan
         </h1>
         <p style={{ fontSize: 15, color: G.muted, lineHeight: 1.55, marginBottom: 28 }}>
-        Your plan is ready. We&apos;ll email it over and add a free golf hydration guide.
+        Get hydration tips and offers from Ross and Harrison straight to your inbox.
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
@@ -125,7 +125,7 @@ export default function EmailCapture({ answers, onSuccess, onBack }: Props) {
               style={{ marginTop: 3, width: 24, height: 24, flexShrink: 0, accentColor: G.green, cursor: 'pointer' }}
             />
             <span style={{ fontSize: 14, fontWeight: 700, color: G.text, lineHeight: 1.5 }}>
-              Yes, email me my plan and send me hydration tips and offers from Hydracaddie. I can unsubscribe anytime.
+              Yes, send me hydration tips and offers from Hydracaddie. I can unsubscribe anytime.
             </span>
           </label>
 

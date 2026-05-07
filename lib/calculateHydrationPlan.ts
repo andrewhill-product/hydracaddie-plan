@@ -37,15 +37,18 @@ const INTENSITY: Record<QuizAnswers['mode'], number> = {
   'buggy':   0.20,
 }
 
+// Multipliers interpolated from Galpin sweat-rate data. Tunable pending Ross confirmation.
 const CLIMATE: Record<QuizAnswers['climate'], number> = {
-  'cool': 1.0,
-  'mild': 1.1,
-  'warm': 1.4,
-  'hot':  1.7,
+  '0-10':  1.0,
+  '11-15': 1.05,
+  '16-20': 1.2,
+  '21-25': 1.4,
+  '26+':   1.6,
 }
 
 const SWEAT: Record<QuizAnswers['sweat'], number> = {
   'low':    0.85,
+  'shower': 0.95,
   'medium': 1.0,
   'high':   1.25,
 }
