@@ -1,249 +1,507 @@
-CLAUDE.md
+# CLAUDE.md
+
 This file gives Claude Code the context it needs to help build the Hydracaddie Hydration Plan tool. Claude reads this first at the start of every session. Keep it up to date.
-Project overview
-Name: Hydracaddie Hydration Plan tool
 
-Purpose: A personalised round hydration plan calculator for golfers. Users answer 7 questions about their round, body, climate and sweat rate. The tool calculates the fluid and electrolyte needs for their round using a golf-adjusted Galpin Equation, captures their email, then shows a personalised checkpoint timeline (Pre-round, Front 9, Back 9, Post-round).
+## Project overview
 
-Primary user: Amateur golfers in the UK, typically discovered via Hydracaddie's Instagram and TikTok channels.
+**Name:** Hydracaddie Hydration Plan tool
 
-Primary goal (v1): Drive email signups. The hydration plan is the value exchange. Email signups feed Hydracaddie's marketing.
+**Purpose:** A personalised round hydration plan calculator for golfers. Users answer 7 questions about their round, body, climate and sweat rate. The tool calculates the fluid needs for their round using a golf-calibrated baseline derived from on-course sweat rate research (O'Donnell et al. 2024) and the ACSM hydration framework (Sawka et al. 2007). The tool then captures their email and shows a personalised checkpoint timeline (Pre-round, Front 9, Back 9, Post-round).
 
-About Hydracaddie: UK golf electrolytes startup (Shopify store), launched September 2025, founded by Harrison and Ross. One hero SKU: Forest Fruits electrolyte sachets, £28 per bag, £6.99 for a sample. Brand promise: "Fuel Your Swing". Channels: Instagram, TikTok, blog. Key stat they use in marketing: dehydration costs golfers 93% of accuracy and 12% of distance.
-Who is building this
-Andy Hill, Senior Product Manager at Ocado Technology. No prior coding experience. This is a learning project as much as a deliverable. When writing code, Claude Code must:
+**Primary user:** Amateur golfers in the UK, typically discovered via Hydracaddie's Instagram and TikTok channels.
 
-Explain what it is doing and why, in plain English, at a level a PM with no coding background can follow
-After each meaningful change, stop and suggest Andy runs the dev server or inspects the diff before moving on
-Never assume knowledge of frameworks, package managers, or syntax. Define each concept the first time it appears
-Teach git workflow alongside the code (when to commit, what to commit, how to undo)
-Invite Andy to ask "why did you do that?" if a decision is non-obvious, rather than silently moving on
+**Primary goal (v1):** Drive email signups. The hydration plan is the value exchange. Email signups feed Hydracaddie's marketing.
 
-This is explicitly learn by doing. Slower than optimal is fine, as long as Andy understands every line by the end of each session.
+**Primary goal (v2):** Convert existing email signups into first-time buyers.
 
-### Scalability default
+**About Hydracaddie:** UK golf electrolytes startup (Shopify store), launched September 2025, founded by Harrison and Ross. One hero SKU: Forest Fruits electrolyte sachets, £28 per bag, £6.99 for a sample. Brand promise: "Fuel Your Swing". Channels: Instagram, TikTok, blog.
 
-Prefer lookup tables and config objects over hardcoded logic. When a new option
-is added in future (a new hole count, a new climate band, a new weight bucket),
-the change should require adding one line to a data table, not editing logic or
-conditionals. If a value appears more than once or drives branching behaviour,
-it belongs in a lookup table. Hardcoded values are only acceptable where the
-value is guaranteed never to change (e.g. the Galpin base rate of 2ml per kg).
+**Marketing stat (corrected):** "Mild dehydration can cut your shot distance by around 11% and nearly double how far you miss by." Sourced from Smith et al. (2012). The original stat used on the homepage ("93% of accuracy and 12% of distance") is misleading and is on the v2 list to fix.
 
+## Who is building this
 
-Stack
-Framework: Next.js 14 (App Router)
-Language: TypeScript (strict mode off for v1, we will tighten later)
-Styling: Tailwind CSS (utility classes only, no custom CSS unless unavoidable)
-Deployment: Vercel, default *.vercel.app URL for v1
-Email capture destination: TBC. Likely a third-party form service (Formspree, Klaviyo embed, ConvertKit, etc.) or a simple Vercel serverless route that forwards to one. No own database in v1.
-No backend logic, no external APIs in v1 beyond the email handoff above. The calculator runs entirely client-side.
-v1 scope
-Single-page web tool with four sections:
+**Andy Hill**, Senior Product Manager at Ocado Technology. No prior coding experience. This is a learning project as much as a deliverable. When writing code, Claude Code must:
 
-Landing hero: headline "Your personal round hydration plan", one-sentence subhead, primary "Start your plan" button, social proof line ("Used by 2,400 golfers" placeholder), short "why hydration matters" line at the bottom of the green hero box.
-Stepper quiz, 7 steps, one question per screen (see "Quiz questions" below). Progress indicator "X of 7" at the top of each step. Smooth transitions.
-Email capture screen. Single email input, one required GDPR-compliant tickbox, links to Privacy Policy and Terms of Service. "Send me my plan" button disabled until tickbox is ticked and a valid email is entered. No skip option.
-Results page. Two cards (Total fluid for your round, Electrolytes you'll lose). Below the cards, a checkpoint timeline titled "Your optimal plan" with stages Pre-round, Front 9, Back 9, Post-round (4 stages for 18 holes, collapses to 3 stages for 9 holes). Each checkpoint has a small icon. Below the timeline, an expandable "How we calculated this" section. Primary CTA at the bottom: "Get your sachets" linking to the Hydracaddie product page with UTM tags.
+- Explain what it is doing and why, in plain English, at a level a PM with no coding background can follow
+- After each meaningful change, stop and suggest Andy runs the dev server or inspects the diff before moving on
+- Never assume knowledge of frameworks, package managers, or syntax. Define each concept the first time it appears
+- Teach git workflow alongside the code (when to commit, what to commit, how to undo)
+- Invite Andy to ask "why did you do that?" if a decision is non-obvious, rather than silently moving on
 
-Explicitly out of scope for v1:
+This is explicitly **learn by doing**. Slower than optimal is fine, as long as Andy understands every line by the end of each session.
 
-Custom domain like plan.hydracaddie.com (v2)
-Shopify integration beyond the outbound product link with UTM tags (v2)
-Analytics, Meta Pixel, cookie consent (v2)
-Saving user quiz answers anywhere (the calc is stateless, only the email is captured)
-Unit tests (we will add Vitest in v2)
-Mobile native, PWA features, offline support
-Multi-language (English only, British spelling)
-Quiz questions (locked, design v4)
-Q1. How many holes are you playing? 9 holes / 18 holes Q2. Walking or in a buggy? Walking / Buggy. Use a custom golf buggy icon for the Buggy option, not a car emoji. Q3. How long does your round usually take? Around 3 hours / Around 4 hours / 5 hours or more / Not sure (we'll use the average for the round length you picked) Q4. What's the weather like when you usually play? Cool (under 15C) / Mild (15-22C) / Warm (22-28C) / Hot (28C+) Q5. How much do you typically sweat on the course? Barely break a sweat / Damp shirt by the back nine / Soaked through, often Q6. Roughly what do you weigh? 60kg or below / 60-70kg / 70-80kg / 80-90kg / 90-100kg / Over 100kg (with kg/lbs toggle) Q7. What's your handicap? Under 10 / 10-18 / 19-28 / 28+ / I don't have one yet
+## Workflow
 
-Important: Handicap (Q7) is collected for personalisation and customer insight only. It does not affect the hydration calculation.
-Business rules (the calc logic)
-Status: numbers below are placeholders pending Ross confirmation on sachet composition. They are honest defaults derived from Galpin's published formula plus golf-specific adjustments. Treat them as tunable.
-Galpin base formula
-2ml of fluid per kg of body weight per 15 minutes of activity
-Round duration
-Use the user's answer to Q3. If they pick "Not sure", default to:
+- Architectural decisions are made in chat with Opus before any code is written.
+- This file is the source of truth for those decisions.
+- Claude Code's job is execution, not design. If a task requires picking between architectural options, stop and surface the decision rather than choosing.
+- Reminder: open a NEW terminal for git commands. The first terminal runs `npm run dev` and silently swallows them.
 
-9 holes: 2 hours
-18 holes: 4 hours
-Weight bucket midpoints (use as the input to the formula)
-60kg or below: 55kg
-60-70kg: 65kg
-70-80kg: 75kg
-80-90kg: 85kg
-90-100kg: 95kg
-Over 100kg: 105kg
-Golf intensity multiplier
-Galpin's formula is calibrated for running. Golf is lower intensity. Apply a multiplier:
+## Scalability default
 
-Walking: 0.35 (roughly 35% of running intensity)
-Buggy: 0.20 (mostly standing, lower sweat rate)
-Climate multiplier
-Cool (under 15C): 1.0
-Mild (15-22C): 1.1
-Warm (22-28C): 1.4
-Hot (28C+): 1.7
-Sweat rate self-report
-Barely break a sweat: 0.85
-Damp shirt by the back nine: 1.0
-Soaked through, often: 1.25
-Sachet recommendation
-One sachet per round is the brand position. Do not display a "sachets recommended" card. Do not vary the sachet count. The hydration plan is the output, the sachet is the answer, full stop.
-Worked example (for reference, not for hard-coded output)
-85kg golfer (midpoint of the 80-90kg bucket), walking 18 holes over 4 hours on a warm UK day, damp shirt sweat:
+Prefer lookup tables and config objects over hardcoded logic. When a new option is added in future (a new hole count, a new climate band, a new weight bucket), the change should require adding one line to a data table, not editing logic or conditionals. If a value appears more than once or drives branching behaviour, it belongs in a lookup table. Hardcoded values are only acceptable where the value is guaranteed never to change.
 
-Base Galpin: 85kg x 2ml x 4 blocks/hr x 4hr = 2,720ml
-Golf walking 0.35: 896ml
-Warm 1.4: 1,254ml
-Sweat 1.0 (damp shirt): 1,254ml
-Round to nearest 50ml for display: ~1,250ml
+Do not sacrifice clarity for scalability: if a lookup table makes something harder to read, document it clearly with a comment.
 
-This matches the worked-example copy in the "How we calculated this" expandable on the results page.
-Electrolyte loss display (informational only)
-Using Galpin's sweat loss ranges per litre of sweat:
+## Stack
 
-Sodium: 500 to 2000mg
-Potassium: 100 to 500mg
-Chloride: 500 to 3000mg
-Calcium: 0 to 100mg
-Magnesium: 0 to 100mg
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript (strict mode off for v1, will tighten in v2)
+- **Styling:** Tailwind CSS (utility classes only, no custom CSS unless unavoidable). Tailwind refactor from inline styles is on the v2 list.
+- **Deployment:** Vercel, default `*.vercel.app` URL for v1
+- **Email capture (v1):** Formspree, form ID `mlgzbrqr`
+- **Email capture (v2):** Migrating to Klaviyo to feed Hydracaddie's Shopify CRM directly
+- **No backend logic, no database in v1.** The calculator runs entirely client-side.
 
-For v1, display sodium and potassium only on the results card. Avoid overwhelming the user.
-Results page checkpoint timeline (locked copy, design v4)
-18-hole round (4 checkpoints)
-Pre-round (before tee): "Mix one sachet in 500ml water. Drink half before you head out, save the rest for the front nine. Pre-hydrating primes your electrolyte levels and stops the back-nine fade before it starts."
-Front 9 (holes 1-9): "Sip every 2-3 holes. Aim to finish the rest of your sachet by the turn. Steady sipping beats big gulps for absorption."
-Back 9 (holes 10-18): "Top up with plain water. Sip every 2-3 holes again. The electrolytes from your sachet will keep working through the back nine."
-Post-round (after 18th): "500ml plain water in the clubhouse. Replaces what you've lost and helps recovery for tomorrow."
-9-hole round (3 checkpoints)
-Pre-round: "Mix one sachet in 500ml water. Drink half before you tee off."
-Mid-round (around hole 5): "Sip the rest of your sachet through the round, every 2-3 holes."
-Post-round: "250-500ml plain water in the clubhouse to recover."
+## Quiz questions (locked, design v5, matches live code)
 
-Each checkpoint has a small icon (golf flag, tee, halfway house, clubhouse) for visual interest.
-"How we calculated this" expandable (locked copy, design v4)
-"We use the Galpin equation, a sports-science formula for fluid intake during activity, then adjust it for the conditions of a round of golf."
-"The base formula is: 2ml of fluid per kg of body weight, every 15 minutes of activity."
-"From there we apply three adjustments based on your answers:"
-"Mode of play: walking burns more energy than riding in a buggy."
-"Climate: hotter conditions raise sweat rate."
-"Self-reported sweat rate: a personal multiplier on top of the climate adjustment."
-"Worked example: an 85kg golfer (in the 80-90kg bucket) walking 18 holes over 4 hours on a warm UK day with damp shirt sweat needs around 1,350ml of fluid across the round."
-"Galpin's formula was originally calibrated for running. We apply a golf-specific intensity multiplier to account for the lower energy demand of a round."
-"Want to read the science? See Fallowfield et al. (1996), 'Effect of water ingestion on endurance capacity during prolonged running', Journal of Sports Sciences, 14(6), 497-502. https://www.tandfonline.com/doi/abs/10.1080/02640419608727736"
-Coding conventions
-Language and copy
-All user-facing copy in British English (colour, optimise, centred, favourite, etc.)
-No em dashes or en dashes anywhere in code, comments or UI copy. Use commas, colons, parentheses, or full stops instead. This is a hard rule
-Metric units primary, imperial toggle for weight (kg primary, lbs secondary)
-Tone: friendly, direct, golf-native, not corporate, not preachy. Short sentences
-File and folder structure
-Components in /app/components/ with PascalCase filenames (e.g. QuizStep.tsx)
-Pure logic functions in /lib/ with camelCase filenames (e.g. calculateHydrationPlan.ts)
-Types in /lib/types.ts
-Brand colours, spacing tokens in tailwind.config.ts
-Component patterns
-Functional components only, no class components
-Hooks for state (useState, useReducer)
-No external state management libraries in v1 (no Zustand, Redux, Jotai, etc.)
-One component per file
-Keep components small and focused
-What to avoid
-Do not introduce new dependencies unless absolutely necessary. Ask Andy first
-Do not enable TypeScript strict mode in v1
-Do not write custom CSS files. Tailwind utilities only
-Do not call the project "the app". It is "the tool" or "the Hydration Plan"
-Do not invent brand colours or fonts. Use the confirmed ones from the Claude Design prototype
-Do not use em or en dashes. Hard rule
-Do not display a "sachets recommended" card. One sachet per round, full stop
-Known inputs pending from Ross
-Claude should flag a reminder at session start if these are still placeholders:
+**Q1. How many holes are you playing?**
+- 9 holes / 18 holes
+- Stored as `'9' | '18'`
 
-Brand colours and typography (captured via Claude Design prototype, will lift from there)
-Logo file (SVG preferred, PNG acceptable)
-Confirmed product URL for the Forest Fruits sachets (for the "Get your sachets" CTA)
-Sachet composition photo from Ross (mg of Na, K, Mg per sachet)
-Email platform decision (Formspree, Klaviyo, ConvertKit, etc.) needed for v1, blocks email capture screen
-Privacy Policy URL (referenced on email capture tickbox)
-Terms of Service URL (referenced on email capture tickbox)
-Final social-proof number for landing hero ("Used by X golfers")
-DNS access for subdomain (needed for v2 only)
-Decision log
+**Q2. Walking or in a buggy?**
+- Walking / Buggy (custom golf buggy icon, not a car emoji)
+- Stored as `'walking' | 'buggy'`
+
+**Q3. How long does your round usually take?**
+- Around 3 hours / Around 4 hours / 5 hours or more / Not sure
+- Stored as `'3h' | '4h' | '5h+' | 'not-sure'`
+- "Not sure" defaults: 9 holes = 120 min, 18 holes = 240 min
+
+**Q4. What's the weather like when you usually play?**
+- 0-10°C / 11-15°C / 16-20°C / 21-25°C / 26°C+
+- Stored as `'0-10' | '11-15' | '16-20' | '21-25' | '26+'`
+
+**Q5. How much do you typically sweat on the course?**
+- Barely break a sweat / I'll need a shower after / Damp shirt by the back nine / Soaked through, often
+- Stored as `'low' | 'shower' | 'medium' | 'high'`
+
+**Q6. Roughly what do you weigh?**
+- 60kg or below / 60-70kg / 70-80kg / 80-90kg / 90-100kg / Over 100kg
+- kg/lbs toggle (cosmetic only, same bucket keys stored)
+- Stored as `'under60' | '60-70' | '70-80' | '80-90' | '90-100' | 'over100'`
+
+**Q7. What's your handicap?**
+- Range slider (-10 to 30) plus "I don't have one yet" button
+- Stored as `'under10' | '10-18' | '19-28' | '28+' | 'none'`
+- **Important:** Handicap is collected for personalisation and CRM segmentation only. It does NOT affect the hydration calculation.
+
+## Calculator engine source of truth
+
+The hydration calculator is anchored on:
+- ACSM position stand on exercise and fluid replacement (Sawka et al., 2007) for the general framework.
+- O'Donnell et al. 2024 (*Sports Medicine*) for the golf-specific evidence base.
+
+Base rate: 2.8ml per kg body weight per hour for a typical walking golfer in mild conditions, dropping to 1.6ml per kg per hour for buggy use. These are calibrated against measured golf-specific sweat rates (Thompsett et al. 2022, cited in O'Donnell 2024), not extrapolated from general fitness equations like the Galpin equation.
+
+Do not reframe the engine as "Galpin x discount" in code or copy. The Galpin equation is for intense exercise; golf is low-to-moderate intensity and warrants its own baseline.
+
+The "one sachet per round" position is a brand position decoupled from the fluid recommendation. The calc outputs ml of fluid; the sachet recommendation is hardcoded copy. Do not generate a sachet count from the fluid number.
+
+### The formula
+
+```
+const BASELINE_ML_PER_KG_PER_HOUR = { walking: 2.8, buggy: 1.6 };
+
+hours = durationMins / 60
+weightKg = WEIGHT_MIDPOINTS[answers.weight]
+baseline = BASELINE_ML_PER_KG_PER_HOUR[answers.mode]
+fluidMl = weightKg x baseline x hours x CLIMATE_MULT[answers.climate] x SWEAT_MULT[answers.sweat]
+totalFluidMl = roundToNearest50(fluidMl)
+```
+
+### Weight bucket midpoints
+
+| Bucket   | Midpoint used |
+|----------|---------------|
+| under60  | 55kg          |
+| 60-70    | 65kg          |
+| 70-80    | 75kg          |
+| 80-90    | 85kg          |
+| 90-100   | 95kg          |
+| over100  | 105kg         |
+
+### Duration mapping
+
+| Answer             | Minutes |
+|--------------------|---------|
+| 3h                 | 180     |
+| 4h                 | 240     |
+| 5h+                | 300     |
+| not-sure (9 holes) | 120     |
+| not-sure (18 holes)| 240     |
+
+### Climate multipliers
+
+| Band    | Multiplier |
+|---------|------------|
+| 0-10°C  | 0.85       |
+| 11-15°C | 1.0        |
+| 16-20°C | 1.2        |
+| 21-25°C | 1.4        |
+| 26°C+   | 2.0        |
+
+Calibrated against measured sweat rate variation across temperature ranges. Cool conditions reduce sweat losses; hot conditions roughly double them vs mild.
+
+### Sweat rate multipliers
+
+| Option                        | Key    | Multiplier |
+|-------------------------------|--------|------------|
+| Barely break a sweat          | low    | 0.85       |
+| I'll need a shower after      | shower | 0.95       |
+| Damp shirt by the back nine   | medium | 1.0        |
+| Soaked through, often         | high   | 1.25       |
+
+### Worked example (sanity check)
+
+85kg golfer, walking, 18 holes, 4 hours, 21-25°C, medium sweat:
+- weightKg = 85
+- baseline = 2.8 (walking)
+- hours = 4
+- climate mult = 1.4
+- sweat mult = 1.0
+- fluidMl = 85 x 2.8 x 4 x 1.4 x 1.0 = 1,332.8ml
+- totalFluidMl rounded to nearest 50 = **1,350ml**
+
+### Post-round 150% rule
+
+Both 9-hole and 18-hole timelines apply ACSM's full-rehydration guidance:
+
+```
+postRoundMl = roundToNearest50(totalFluidMl x 1.5)
+```
+
+### Electrolyte loss values (computed but currently hidden in UI)
+
+Calculated from `totalFluidMl` for potential future surfacing:
+- Sodium: 500 to 2000mg per litre of fluid lost
+- Potassium: 100 to 500mg per litre of fluid lost
+
+The electrolyte card was removed from the UI in May 2026 to keep the results page focused.
+
+## Sachet positioning rules
+
+**One sachet per round is the brand position.** Do not display a "sachets recommended" card. Do not vary the sachet count. Do not generate a sachet count from the fluid number. The hydration plan is the calc output, the sachet is the answer.
+
+The sachet recommendation appears as hardcoded copy in the Pre-round checkpoint ("Mix one sachet in 500ml water"), never derived from the calc.
+
+## Results page checkpoint timeline (locked, matches live code)
+
+### 18-hole round (4 checkpoints, dynamic from `buildCheckpoints18(totalFluidMl)`)
+
+```
+front9Ml = roundToNearest50(totalFluidMl / 2)
+back9Ml = totalFluidMl - front9Ml
+postRoundMl = roundToNearest50(totalFluidMl x 1.5)
+```
+
+| Checkpoint       | Subtitle          | Action                              | Body |
+|------------------|-------------------|-------------------------------------|------|
+| Pre-round        | Before the first tee | Mix one sachet in 500ml water    | "Start sipping 2 hours before your tee time, not on the first tee. Drink half your sachet in the build-up to your round and save the rest for the front nine. Getting ahead of your fluid needs before hole one is the easiest win in golf hydration." |
+| Front 9          | Holes 1 to 9      | Aim for **{front9Ml}ml** by the turn | "Sip your sachet every 2-3 holes, topping up with plain water as needed. Steady sipping beats big gulps for absorption." |
+| Back 9           | Holes 10 to 18    | Top up with **{back9Ml}ml** of plain water | "Sip every 2-3 holes. The electrolytes from your sachet will keep working through the back nine." |
+| Post-round       | After the 18th    | **{postRoundMl}ml** plain water in the clubhouse | "Sports science recommends replacing 150% of fluid lost after exercise to fully rehydrate. Based on your estimated sweat loss of {totalFluidMl}ml, aim for {postRoundMl}ml before you head home." |
+
+### 9-hole round (3 checkpoints, dynamic from `buildCheckpoints9(totalFluidMl)`)
+
+| Checkpoint  | Subtitle          | Action              | Body |
+|-------------|-------------------|---------------------|------|
+| Pre-round   | Before the first tee | Mix one sachet in 500ml water | "Start sipping 2 hours before your tee time. Drink half your sachet in the build-up and save the rest for the course." |
+| Mid-round   | Around hole 5     | Sip every 2-3 holes | "Sip the rest of your sachet through the round." |
+| Post-round  | After the 9th     | **{postRoundMl}ml** plain water in the clubhouse | "Sports science recommends replacing 150% of fluid lost after exercise to fully rehydrate. Based on your estimated sweat loss of {totalFluidMl}ml, aim for {postRoundMl}ml before you head home." |
+
+## "How we calculated this" expandable (locked copy)
+
+Three paragraphs:
+
+> Your plan is built on hydration guidelines from the American College of Sports Medicine, calibrated against the latest golf-specific evidence base (O'Donnell et al., 2024, *Sports Medicine*).
+
+> The base recommendation is roughly 2.8ml of fluid per kilogram of body weight per hour for a typical golfer walking the course in mild conditions, derived from on-course sweat rate measurements. We then adjust for your weather, your sweat rate, and whether you walk or take a buggy.
+
+> The 150% post-round rule for replacing lost fluid is from ACSM guidance for full rehydration after exercise.
+
+### Citations shown to user
+
+Two-citation block in small/lower-opacity style:
+
+- Sawka et al. (2007), American College of Sports Medicine position stand on exercise and fluid replacement.
+  https://pubmed.ncbi.nlm.nih.gov/17277604/
+- O'Donnell et al. (2024), Nutrition and Golf Performance: A Systematic Scoping Review. *Sports Medicine*.
+  https://pmc.ncbi.nlm.nih.gov/articles/PMC11608286/
+
+### Disclaimer (unchanged, hardcoded)
+
+> This estimate is guidance. Please consult with a healthcare professional for personalised advice.
+
+## Homepage hero stat (v2 fix pending)
+
+The current live homepage carries the misleading stat: "Dehydration causes golfers to lose 93% of their accuracy and 12% of their distance." Approved replacement copy:
+
+> Mild dehydration can cut your shot distance by around 11% and nearly double how far you miss by.
+
+Source: Smith et al. (2012), *Journal of Strength and Conditioning Research*.
+https://pubmed.ncbi.nlm.nih.gov/22190159/
+
+Citation should display in small/lower-opacity style under the stat. Always pair dehydration claims with "mild" or equivalent qualifier; the underlying study is on mild dehydration only.
+
+This homepage update is a separate Claude Code session, scheduled as part of v2 work.
+
+## Coding conventions
+
+### Language and copy
+
+- All user-facing copy in British English (colour, optimise, centred, favourite, etc.)
+- **No em dashes or en dashes anywhere in code, comments or UI copy.** Use commas, colons, parentheses, or full stops instead. Hard rule.
+- Metric units primary, imperial toggle for weight (kg primary, lbs secondary)
+- Tone: friendly, direct, golf-native, not corporate, not preachy. Short sentences.
+
+### File and folder structure
+
+- Components in `/app/components/` with PascalCase filenames (e.g. `Results.tsx`)
+- Pure logic functions in `/lib/` with camelCase filenames (e.g. `calculateHydrationPlan.ts`)
+- Types in `/lib/types.ts`
+- Brand colours, spacing tokens in `tailwind.config.ts`
+
+### Component patterns
+
+- Functional components only, no class components
+- Hooks for state (`useState`, `useReducer`)
+- No external state management libraries in v1 (no Zustand, Redux, Jotai, etc.)
+- One component per file
+- Keep components small and focused
+
+### What to avoid
+
+- Do not introduce new dependencies unless absolutely necessary. Ask Andy first.
+- Do not enable TypeScript strict mode in v1.
+- Do not write custom CSS files. Tailwind utilities only.
+- Do not call the project "the app". It is "the tool" or "the Hydration Plan".
+- Do not invent brand colours or fonts. Use the confirmed ones from the Claude Design prototype.
+- Do not use em or en dashes. Hard rule.
+- Do not display a "sachets recommended" card. One sachet per round, full stop.
+- Do not anchor the calc engine on Galpin in code or copy. Use the ACSM + O'Donnell framing throughout.
+
+## Known inputs pending from Ross
+
+- [x] Brand colours and typography (captured via Claude Design prototype)
+- [x] Logo file (SVG)
+- [x] Confirmed product URL for the Forest Fruits sachets (with UTM tags)
+- [ ] Sachet composition data from Ross (mg of Na, K, Mg per sachet) -- needed to verify "one sachet covers a typical round" claim
+- [x] Email platform decision (Formspree v1, Klaviyo v2)
+- [x] Privacy Policy URL
+- [x] Terms of Service URL
+- [x] Final social-proof number for landing hero (currently hardcoded "150+", on v2 list to make dynamic)
+- [ ] DNS access for subdomain (needed for v2 only)
+
+## Decision log
+
 Locked decisions so we do not re-litigate them:
 
-Next.js 14 App Router over Pages Router (modern default, simpler folder structure for Andy to learn)
-TypeScript over plain JavaScript (catches errors, teaches better habits). Strict mode off for v1
-Tailwind CSS over CSS Modules or styled-components (fastest to iterate, Claude Code is strong at it)
-Vercel default URL for v1, custom subdomain deferred to v2
-Email capture is in v1. Required to see results, single GDPR tickbox, no skip option. Email destination platform still TBC
-British English everywhere, no em or en dashes anywhere
-One sachet per round is the brand position. No sachet count card, no 1-to-3 dosing logic
-Golf intensity multiplier is applied. The tool is honest that Galpin was designed for running, not golf
-Client-side calc only in v1. No server, no database, no external API calls beyond the email handoff
-9 or 18 holes only. 27 and 36 hole options removed from the quiz
-Handicap (Q7) is data-only. Captured for customer insight, does not affect the calc
-Checkpoint timeline is the hero element of the results page. Designed to be screenshot-worthy and shareable on Instagram and TikTok
-13. Scalability by default.
-14. v1 uses inline styles, not Tailwind utilities. Sessions 1 to 3 silently bypassed the original Tailwind-only convention. Refactor to Tailwind is deferred to v2. Brand colours live in the local G const in app/page.tsx and app/components/QuizStepper.tsx.
-15. Brand greens in use: #1A7A3C (primary), #155F2E (dark), #2A9B52 (mid), #EAF4EE (light tint). Update tailwind.config.ts to match in v2 refactor.
-16. Worked example uses bucket midpoint, not raw user weight. 85kg is the midpoint of the 80-90kg bucket and produces 1,350ml.
-17. Post-round rehydration uses the 150% rule (1.5x sweat loss), confirmed by golf-specific sports science literature (O'Donnell et al., 2024; ACSM, 2007).
-18. OPEN QUESTION for Ross: the walking intensity multiplier (0.35) may be too aggressive. Golf-specific research (O'Donnell et al., 2024) recommends 150ml per 15 minutes on-course regardless of body weight, which for a 4-hour round implies 2,400ml before climate and sweat adjustments. Our Galpin-adjusted figure for a typical walking golfer is approximately 1,350ml. The gap suggests our multiplier could be revised upward. Do not change the multiplier without Ross sign-off. The value lives in INTENSITY in lib/calculateHydrationPlan.ts.
+1. **Next.js 14 App Router** over Pages Router (modern default, simpler folder structure)
+2. **TypeScript** over plain JavaScript. Strict mode off for v1
+3. **Tailwind CSS** over CSS Modules or styled-components. Inline styles in v1 are a known debt; refactor in v2
+4. **Vercel default URL for v1**, embed into hydracaddie.com via iframe in v2
+5. **Email capture is in v1.** Required to see results, single GDPR tickbox, no skip option
+6. **British English** everywhere, no em or en dashes
+7. **One sachet per round is the brand position.** No sachet count card, no dosing logic
+8. **Calc engine anchored on ACSM + O'Donnell 2024**, not Galpin. Galpin framing is misleading because golf is low-to-moderate intensity, not the intense exercise context Galpin was derived for.
+9. **Client-side calc only in v1.** No server, no database, no external API calls beyond email handoff
+10. **9 or 18 holes only.** 27 and 36 hole options removed from quiz
+11. **Handicap (Q7) is data-only.** Captured for CRM segmentation, does not affect calc
+12. **Checkpoint timeline is the hero element of the results page.** Designed to be screenshot-worthy and shareable on Instagram and TikTok
+13. **Scalability by default.** Lookup tables over hardcoded logic. New options require one line added to config, not edits to branching logic.
+14. **5-band climate scale** (0-10 / 11-15 / 16-20 / 21-25 / 26+), not the original 4-band (Cool/Mild/Warm/Hot). Bands recalibrated May 2026 to expand cold and hot ends (0.85 / 1.0 / 1.2 / 1.4 / 2.0).
+15. **4-option sweat scale** (low / shower / medium / high), not the original 3-option. Added "I'll need a shower after" as a mid-low band in May 2026.
+16. **Post-round 150% rule** applied for both 9-hole and 18-hole rounds, derived from ACSM full-rehydration guidance.
+17. **Citations on plan page** are Sawka 2007 + O'Donnell 2024. Fallowfield 1996 (Galpin source) was removed in May 2026.
 
-Golf hydration research references
-The following peer-reviewed sources were reviewed in session 7 (May 2026) and inform the calc logic and checkpoint copy. Use these as the reference baseline when Ross reviews the multipliers.
+## Current state
 
-On-course hydration
-- O'Donnell, A., Murray, A., Nguyen, A., Salmon, T., Taylor, S., Morton, J. P., & Close, G. L. (2024). Nutrition and Golf Performance: A Systematic Scoping Review. Sports Medicine, 1-15.
-  Key finding: 150ml per 15 minutes on-course; keep fluid loss below 1% of body weight.
-- O'Donnell, A., Dunne, D., Close, G. L. (2023). Nutrition, Hydration and Golf. Aspetar Sports Medicine Journal. 12. https://journal.aspetar.com/en/archive/volume-12-targeted-topic-sports-medicine-in-golf/nutrition-hydration-and-golf
-- Berlin, N., Cooke, M. B., & Belski, R. (2023). Nutritional considerations for elite golf: A narrative review. Nutrients, 15(19), 4116.
-- Smith, M. F., Newell, A. J., & Baker, M. R. (2012). Effect of acute mild dehydration on cognitive-motor performance in golf. Journal of Strength and Conditioning Research, 26(11), 3075-3080.
-- Stevenson, W., Zabinsky, J. S., & Hedrick, V. E. (2019). Effects of Dehydration on Cognitive and Physical Performance in Female Golfers: A Randomized Crossover Pilot Study. J, 2(4), 496-507.
+**v1 Status:** Shipped. Live at https://hydracaddie-plan.vercel.app/
 
-Post-round rehydration
-- American College of Sports Medicine (2007). Exercise and fluid replacement. Med Sci Sports Exerc, 39(2), 377-90.
-  Key finding: replace 1.5x fluid lost post-exercise. Confirms our 150% post-round rule.
-- Maughan, R. J., et al. (2016). A randomized trial to assess the potential of different beverages to affect hydration status: development of a beverage hydration index. American Journal of Clinical Nutrition, 103(3).
+**v2 in flight (priority order):**
 
-Electrolytes and cognitive performance
-- Stevenson, E. J., Hayes, P. R., & Allison, S. J. (2009). The effect of a carbohydrate-caffeine sports drink on simulated golf performance. Applied physiology, nutrition, and metabolism, 34(4), 681-688.
-- Thompsett, D. J., Vento, K.A., Der Ananian, C., Hondula, D., Wardenaar, F. C. (2022). The effects of three different types of macronutrient feedings on golf performance and levels of fatigue and alertness. Nutrition and Health, 28(4), 509-14.
-- Riebl, S. K., & Davy, B. M. (2013). The Hydration Equation: Update on Water Balance and Cognitive Performance. ACSM's health and fitness journal, 17(6), 21-28.
-- Savoie, F. A., et al. (2015). Effect of Hypohydration on Muscle Endurance, Strength, Anaerobic Power and Capacity and Vertical Jumping Ability: A Meta-Analysis. Sports Medicine, 45(8), 1207-1227.
+1. Science copy fix on homepage hero (replacing the misleading 93%/12% stat)
+2. Klaviyo migration (replacing Formspree, urgent because Formspree free tier nearly maxed)
+3. Klaviyo welcome flow (drives conversion of existing list to first purchase)
+4. Analytics: GA4, Meta Pixel, cookie banner
+5. Tailwind refactor (replace inline styles)
+6. iframe embed into hydracaddie.com via Shopify
+7. Slider UX improvement on Q7 (mobile)
+8. Live signup count (replace hardcoded "150+")
 
-Hydration monitoring
-- Gunawan, A., Brandon, D., Puspa, V., & Wiweko, B. (2018). Development of Urine Hydration System Based on Urine Color and Support Vector Machine. Procedia Computer Science, 135, 481-489.
-- Magee, P. J., Gallagher, A. M., & McCormack, J. M. (2017). High prevalence of dehydration and inadequate nutritional knowledge among university and club level athletes. Int J Sport Nutr Exerc Metab, 27(2), 158-68.
+## How to work with this codebase
 
-Warm-up and performance context
-- Goswami, C. L., Shepherd, A. J., Langdown, B. L., Knight, J. M., & Maguire, A. J. (2025). Acute Effects of Different Warm-Up Protocols on Junior Golfers' Drive Performance. International Journal of Strength and Conditioning, 5(1). https://doi.org/10.47206/ijsc.v5i1.343
+### Running locally
 
-Current state
-Status: v1 shipped, 4 May 2026. Full flow live on Vercel: landing, 7-step quiz, email capture (Formspree), results page with checkpoint timeline and UTM CTA. Privacy Policy and Terms of Service links live. Back button working across all screens.
+```
+npm run dev  # starts the dev server at localhost:3000
+```
 
-Outstanding placeholders for v2:
-- Social proof number (currently hardcoded 2,400+) — confirm with Ross
-- Sachet composition (real Na/K/Mg mg per sachet) — confirm with Ross
-- Slider UX improvement on mobile
-- Custom domain (plan.hydracaddie.com)
-- Analytics (Meta Pixel, Google Analytics, cookie consent)
-- Social media engagement dashboard (separate mini project)
-How to work with this codebase
-Running locally
-npm run dev # starts the dev server at localhost:3000
-Committing
+### Committing
+
 After each working change, Andy should:
 
+```
 git add .
-
 git commit -m "short description of what changed"
-
 git push
+```
+
+Suggest the short description.
+
+**Reminder:** open a NEW terminal for git commands. The `npm run dev` terminal silently swallows them.
 
 Claude Code should suggest commit messages when appropriate.
-Deploying
-Vercel auto-deploys every push to main once the GitHub repo is connected to Vercel. No manual deploy step once set up.
 
+### Deploying
+
+Vercel auto-deploys every push to `main`. No manual deploy step.
+
+## v2 next steps detail
+
+This expands on the v2 priority list in "Current state". Each item captures the goal, the agreed approach, any locked or pending architectural decisions, and dependencies on other items. Items follow the priority order in "Current state".
+
+Use this section to brief future Opus chat sessions and Claude Code sessions. Anything marked "decisions pending" needs an Opus chat session before code is written.
+
+### Calc engine refresh (immediate, in flight, not in the priority list)
+
+**Status:** Specced. Three Claude Code prompts ready to execute.
+
+**Goal:** Bring the calc engine into alignment with the ACSM + O'Donnell framing locked in this CLAUDE.md. Engine reframe (rename Galpin-anchored constants), climate band recalibration (expand cold and hot ends), 9-hole post-round personalisation, citation switch, "How we calculated this" copy update.
+
+**Decisions locked:** walking baseline 2.8 ml/kg/hour, buggy 1.6 ml/kg/hour, climate multipliers 0.85/1.0/1.2/1.4/2.0, citations Sawka 2007 + O'Donnell 2024.
+
+**Sequencing:** Complete before any v2 backlog item. Once shipped, Item 1 (homepage hero stat fix) can follow in the same week.
+
+### Item 1: Homepage hero stat fix
+
+**Status:** Copy locked, ready for Claude Code session.
+
+**Goal:** Replace the misleading "93% accuracy / 12% distance" stat with the corrected Smith et al. 2012 framing. See "Homepage hero stat (v2 fix pending)" section for exact copy.
+
+**Architectural decisions:** None. Pure copy change. Add citation in small/lower-opacity style under the stat.
+
+**Sequencing:** Single 1-session job. Run immediately after the calc engine refresh ships.
+
+### Item 2: Klaviyo migration (urgent)
+
+**Status:** Step zero pending. Confirm Klaviyo is connected to the Shopify store. Ross or Harrison can check via Shopify admin, Apps section.
+
+**Goal:** Replace Formspree (free tier near cap, blocking new signups soon) with Klaviyo for email capture. Klaviyo's native Shopify connector then auto-creates a Shopify customer record from each new email.
+
+**Approach:** Client-side Klaviyo track and identify API replaces the current Formspree form POST. Quiz answers passed as Klaviyo profile properties so future flows can segment on them.
+
+**Architectural decisions pending (need Opus chat session before Claude Code):**
+
+- Profile property schema. Which quiz answers become Klaviyo profile properties (durable user attributes) vs metric event metadata (one-time event data). This shapes future segmentation. Annoying to retrofit.
+- Cutover strategy. Hard cut Formspree to Klaviyo, or dual-write for one week as a safety net.
+- Error handling. Current Formspree fails silently. Klaviyo failure should at minimum log to console. Decide whether to surface to user.
+- Sub-decision: Ross's idea of tagging Shopify customers who complete the quiz. This is configured in Klaviyo's flow builder using the native Shopify connector, no separate code. Tag name like `did_hydration_quiz`, optionally with quiz-derived tags too (e.g. `high_sweat_segment`). Does not need a separate Claude Code session, just Klaviyo UI work.
+
+**Dependencies:** Klaviyo confirmed connected, or set up if not (free tier covers up to 250 contacts).
+
+### Item 3: Klaviyo welcome flow
+
+**Status:** Pending. No code work, entirely in Klaviyo UI.
+
+**Goal:** Convert the existing email list to first-time buyers. This is the actual conversion lever for v2, not the embed.
+
+**Approach:** 3 to 5 email welcome sequence triggered by quiz signup, with copy personalised using the quiz answers (sweat tier, walking vs buggy, weight bracket). Final email contains a discounted first-order CTA.
+
+**Architectural decisions pending (Opus chat session):**
+
+- Flow shape. Number of emails, gap between them, branching by segment.
+- Offer mechanics. Percentage discount, bundle, free sample, or other.
+- Trigger logic. Quiz completion vs email submission (subtly different in Klaviyo terms).
+
+**Dependencies:** Item 2 (Klaviyo migration) must be live first.
+
+### Item 4: Analytics (GA4, Meta Pixel, cookie banner)
+
+**Status:** Pending.
+
+**Goal:** Track funnel conversion from quiz start to email submission to Shopify purchase. Free tier coverage only for v2.
+
+**Approach:** GA4 for analytics, Meta Pixel for ad attribution, cookie consent banner for GDPR compliance. All free.
+
+**Architectural decisions pending (Opus chat session):**
+
+- Event structure. Which quiz steps fire events (quiz_started, quiz_step_n_completed, email_submitted, plan_viewed, cta_clicked).
+- Consent banner placement. Lives on Vercel side (current quiz domain) or Shopify side (post-embed).
+- GTM vs direct script tags. GTM gives flexibility but adds complexity for a learner. Direct snippets are simpler.
+
+**Dependencies:** Ideally done before Item 6 (iframe embed) so analytics work consistently across the embed boundary.
+
+### Item 5: Tailwind refactor
+
+**Status:** Pending.
+
+**Goal:** Replace inline styles in the codebase with Tailwind utility classes. Pure technical debt cleanup. Tailwind is already installed but unused.
+
+**Approach:** Incremental component-by-component conversion. Visual regression check (manually click through quiz) before and after each component.
+
+**Architectural decisions pending:**
+
+- Big bang vs incremental. Incremental recommended for safety with a learner.
+- Whether to extract shared design tokens to `tailwind.config.ts` first, or convert inline first and refactor tokens after. Likely tokens first.
+
+**Dependencies:** Do before Item 6 (iframe embed) so embedded styles are clean from day one.
+
+### Item 6: Shopify iframe embed (marquee v2 item)
+
+**Status:** Pending.
+
+**Goal:** Tool lives at `hydracaddie.com/pages/hydration-plan`, embedded as an iframe pointing at the Vercel-hosted Next.js app. Visually, looks like a part of the Shopify site.
+
+**Approaches considered and rejected:**
+
+- Full Liquid port (rewrite the React quiz state machine into Liquid plus Alpine.js). Too much for a learner with no Shopify dev experience. Estimated 4-week stretch project. Rejected.
+- Stay on Vercel forever, link only from Shopify. Rejected because Ross's stated goal is to embed.
+
+**Approach decided:** iframe at `hydracaddie.com/pages/hydration-plan`. Parent Shopify page hosts the iframe. postMessage protocol for height auto-sizing on mobile.
+
+**Architectural decisions pending (Opus chat session):**
+
+- Exact URL path on hydracaddie.com. `pages/hydration-plan` is the placeholder.
+- Mobile height handling. postMessage handler in the parent. Child sends height on every render and on window resize.
+- Visual seams. Matching fonts, background colour, and edge-to-edge layout to make the iframe disappear visually.
+- Cross-domain analytics. GA4 cross-domain tracking config so the funnel reads as one journey, not two.
+- SEO. The embedded page needs minimal SEO since it is a conversion surface, not a discovery surface. The parent Shopify page should have basic meta description and Open Graph tags.
+- Who has Shopify admin access. Andy or Ross or Harrison. Decide before the session.
+
+**Dependencies:** Items 2 and 3 (Klaviyo migration and welcome flow) live first, so the email pipeline already works regardless of where the UI lives. Items 4 and 5 (analytics and Tailwind) strongly recommended before this.
+
+### Item 7: Slider UX improvement (Q7)
+
+**Status:** Pending. Small.
+
+**Goal:** The handicap range slider on Q7 is fiddly on mobile. Improve touch target size and live value display.
+
+**Approach options:**
+
+- Larger touch hit area on the slider thumb.
+- Snap-to-value behaviour (handicap is bucketed anyway).
+- Replace slider with a numeric input plus + and - buttons.
+
+**Architectural decisions:** Design call, can be made in a Claude Code session if the right approach becomes obvious during build.
+
+**Dependencies:** None.
+
+### Item 8: Live signup count
+
+**Status:** Pending. Small.
+
+**Goal:** Replace the hardcoded "150+" social proof on the homepage with a real number that reflects actual signups.
+
+**Approach options:**
+
+- Klaviyo API call on page load. Introduces latency and an API key concern client-side.
+- Static value updated weekly via a script or manual paste. Simpler.
+
+**Architectural decisions pending:**
+
+- Live count vs periodic update. Periodic update probably fine for v2, simpler. Live count is "nice to have", not "needs".
+- If live: API key handling. Server-side rendering vs client-side.
+
+**Dependencies:** Item 2 (Klaviyo) live so there is a count to pull.

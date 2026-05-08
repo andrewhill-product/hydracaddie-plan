@@ -88,13 +88,12 @@ const [quizStartStep, setQuizStartStep] = useState(0) // which Q to return to if
             Your personal hydration plan
           </h1>
 
-          <p style={{ color: 'rgba(255,255,255,0.82)', fontSize: 15.5, lineHeight: 1.55, maxWidth: 300 }}>
-            Dehydration causes golfers to lose 93% of their accuracy and 12% of their distance.
+          <p style={{ color: 'rgba(255,255,255,0.82)', fontSize: 15.5, lineHeight: 1.55, maxWidth: 320 }}>
+            Mild dehydration can cut your shot distance by around 11% and nearly double how far you miss by.
           </p>
-
           <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.15)' }}>
             <p style={{ color: 'rgba(255,255,255,0.68)', fontSize: 13, lineHeight: 1.5, fontWeight: 600 }}>
-              Use our free tool based on The Galpin Equation that tells you how much to drink on the course.
+              Built on peer-reviewed, R&amp;A-funded golf hydration research. Find out exactly how much to drink and when.
             </p>
           </div>
         </div>
@@ -123,7 +122,7 @@ const [quizStartStep, setQuizStartStep] = useState(0) // which Q to return to if
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[
             { icon: '⚡', text: 'Takes under 60 seconds' },
-            { icon: '🔬', text: 'Based on the Galpin equation' },
+            { icon: '🔬', text: 'Based on golf-specific sports science' },
             { icon: '🎯', text: 'Personalised to your round' },
           ].map(({ icon, text }) => (
             <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

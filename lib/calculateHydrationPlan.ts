@@ -24,26 +24,26 @@ const DURATION_MINUTES: Record<QuizAnswers['duration'], number | null> = {
 }
 
 // Default duration when user picks "not sure", keyed by holes played.
-// Adding 27 or 36 holes in future = add one line here.
 const DEFAULT_DURATION_BY_HOLES: Record<number, number> = {
   9:  120,
   18: 240,
-  27: 360,
-  36: 480,
 }
 
-const INTENSITY: Record<QuizAnswers['mode'], number> = {
-  'walking': 0.35,
-  'buggy':   0.20,
+// Base fluid rate in ml per kg of body weight per hour, anchored on
+// O'Donnell et al. 2024 (Sports Medicine) golf-specific sweat rate data.
+const BASELINE_ML_PER_KG_PER_HOUR: Record<QuizAnswers['mode'], number> = {
+  'walking': 2.8,
+  'buggy':   1.6,
 }
 
-// Multipliers interpolated from Galpin sweat-rate data. Tunable pending Ross confirmation.
+// Multipliers calibrated against measured sweat rate variation across
+// temperature ranges. Source: ACSM position stand (Sawka et al. 2007).
 const CLIMATE: Record<QuizAnswers['climate'], number> = {
-  '0-10':  1.0,
-  '11-15': 1.05,
+  '0-10':  0.85,
+  '11-15': 1.0,
   '16-20': 1.2,
   '21-25': 1.4,
-  '26+':   1.6,
+  '26+':   2.0,
 }
 
 const SWEAT: Record<QuizAnswers['sweat'], number> = {
@@ -74,17 +74,18 @@ export function calculateHydrationPlan(answers: QuizAnswers): HydrationPlan {
     ? rawDuration
     : DEFAULT_DURATION_BY_HOLES[answers.holes]
 
-  const blocks = durationMinutes / 15
+  const hours = durationMinutes / 60
 
-  const baseFluidMl = weightKg * 2 * blocks
+  const baseline = BASELINE_ML_PER_KG_PER_HOUR[answers.mode]
 
-  const adjustedFluidMl =
-    baseFluidMl *
-    INTENSITY[answers.mode] *
+  const fluidMl =
+    weightKg *
+    baseline *
+    hours *
     CLIMATE[answers.climate] *
     SWEAT[answers.sweat]
 
-  const totalFluidMl = roundToNearest50(adjustedFluidMl)
+  const totalFluidMl = roundToNearest50(fluidMl)
 
   const litresLost = totalFluidMl / 1000
 

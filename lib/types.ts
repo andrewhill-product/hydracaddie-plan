@@ -2,7 +2,6 @@
 // This file defines the "shape" of data flowing through the tool.
 // Think of it like a contract: if you write QuizAnswers, TypeScript
 // knows exactly what fields to expect and will warn you if one is missing.
-// This is for the galpin calc
 
 export type HolesPlayed = 9 | 18
 

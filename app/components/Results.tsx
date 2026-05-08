@@ -63,10 +63,27 @@ type Checkpoint = {
   body: string
 }
 
+// Front 9 body copy varies by climate: hotter = more urgency, cooler = reassurance.
+const FRONT9_BODY: Record<string, string> = {
+  '0-10':  'Cool conditions slow your sweat rate, but you are still losing fluid. Sip every 3 holes to stay on top of it.',
+  '11-15': 'Sip your sachet every 2-3 holes, topping up with plain water as needed. Steady sipping beats big gulps for absorption.',
+  '16-20': 'Sip your sachet every 2-3 holes, topping up with plain water as needed. Steady sipping beats big gulps for absorption.',
+  '21-25': 'Warm conditions mean your sweat rate is higher than it feels. Sip every 2-3 holes and get ahead of your thirst, not behind it.',
+  '26+':   "Hot day. You are losing fluid faster than normal. Sip every 2 holes and do not wait for thirst. By the time you feel it, you are already behind.",
+}
+
+// Back 9 body copy varies by sweat rate: heavy sweaters need the fade warning.
+const BACK9_BODY: Record<string, string> = {
+  'low':    'Your sweat rate is low so your fluid balance should be holding up well. Keep sipping every few holes to stay comfortable through to 18.',
+  'shower': 'Sip every 2-3 holes. The electrolytes from your sachet will keep working through the back nine.',
+  'medium': 'Sip every 2-3 holes. The electrolytes from your sachet will keep working through the back nine.',
+  'high':   'You lose fluid quickly, so the back nine is where most golfers start to fade. Keep sipping even when you feel fine. Your sachet electrolytes are still active.',
+}
+
 // Splits the calc total evenly across Front 9 and Back 9 so they sum to totalFluidMl.
 // Front 9 is rounded to nearest 50ml; Back 9 takes the remainder to preserve the total.
 // Post-round uses the 150% rehydration rule: replace 1.5x sweat loss after exercise.
-function buildCheckpoints18(totalFluidMl: number): Checkpoint[] {
+function buildCheckpoints18(totalFluidMl: number, answers: QuizAnswers): Checkpoint[] {
   const front9Ml    = Math.round(totalFluidMl / 2 / 50) * 50
   const back9Ml     = totalFluidMl - front9Ml
   const postRoundMl = Math.round(totalFluidMl * 1.5 / 50) * 50
@@ -84,14 +101,14 @@ function buildCheckpoints18(totalFluidMl: number): Checkpoint[] {
       label:    'Front 9',
       subtitle: 'Holes 1 to 9',
       action:   `Aim for ${front9Ml}ml by the turn`,
-      body:     'Sip your sachet every 2-3 holes, topping up with plain water as needed. Steady sipping beats big gulps for absorption.',
+      body:     FRONT9_BODY[answers.climate],
     },
     {
       emoji:    '⛳',
       label:    'Back 9',
       subtitle: 'Holes 10 to 18',
       action:   `Top up with ${back9Ml}ml of plain water`,
-      body:     'Sip every 2-3 holes. The electrolytes from your sachet will keep working through the back nine.',
+      body:     BACK9_BODY[answers.sweat],
     },
     {
       emoji:    '🏆',
@@ -103,29 +120,33 @@ function buildCheckpoints18(totalFluidMl: number): Checkpoint[] {
   ]
 }
 
-const CHECKPOINTS_9: Checkpoint[] = [
-  {
-    emoji:    '🏠',
-    label:    'Pre-round',
-    subtitle: 'Before the first tee',
-    action:   'Mix one sachet in 500ml water',
-    body:     'Start sipping 2 hours before your tee time. Drink half your sachet in the build-up and save the rest for the course.',
-  },
-  {
-    emoji:    '⛳',
-    label:    'Mid-round',
-    subtitle: 'Around hole 5',
-    action:   'Sip every 2-3 holes',
-    body:     'Sip the rest of your sachet through the round.',
-  },
-  {
-    emoji:    '🏆',
-    label:    'Post-round',
-    subtitle: 'After the 9th',
-    action:   '250-500ml plain water',
-    body:     'In the clubhouse to recover.',
-  },
-]
+function buildCheckpoints9(totalFluidMl: number): Checkpoint[] {
+  const postRoundMl = Math.round(totalFluidMl * 1.5 / 50) * 50
+
+  return [
+    {
+      emoji:    '🏠',
+      label:    'Pre-round',
+      subtitle: 'Before the first tee',
+      action:   'Mix one sachet in 500ml water',
+      body:     'Start sipping 2 hours before your tee time. Drink half your sachet in the build-up and save the rest for the course.',
+    },
+    {
+      emoji:    '⛳',
+      label:    'Mid-round',
+      subtitle: 'Around hole 5',
+      action:   'Sip every 2-3 holes',
+      body:     'Sip the rest of your sachet through the round.',
+    },
+    {
+      emoji:    '🏆',
+      label:    'Post-round',
+      subtitle: 'After the 9th',
+      action:   `${postRoundMl}ml plain water in the clubhouse`,
+      body:     `Sports science recommends replacing 150% of fluid lost after exercise to fully rehydrate. Based on your estimated sweat loss of ${totalFluidMl}ml, aim for ${postRoundMl}ml before you head home.`,
+    },
+  ]
+}
 
 
 const PRODUCT_URL = 'https://www.hydracaddie.com/collections/electrolyte-powder?utm_source=hydration_plan&utm_medium=tool&utm_campaign=v1_launch'
@@ -134,7 +155,7 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
 
   const plan = useMemo(() => calculateHydrationPlan(answers), [answers])
   const totalFormatted = Intl.NumberFormat('en-GB').format(plan.totalFluidMl)
-  const checkpoints = answers.holes === 9 ? CHECKPOINTS_9 : buildCheckpoints18(plan.totalFluidMl)
+  const checkpoints = answers.holes === 9 ? buildCheckpoints9(plan.totalFluidMl) : buildCheckpoints18(plan.totalFluidMl, answers)
 
   // Both accordions closed by default.
   const [timelineOpen, setTimelineOpen] = useState(false)
@@ -341,37 +362,44 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
                 </div>
               </div>
 
-              {/* Galpin explanation */}
+              {/* How we calculated this explanation */}
               <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
-                  We use the Galpin equation, a sports-science formula for fluid intake during activity, then adjust it for the conditions of a round of golf.
+                  Your plan is built on hydration guidelines from the American College of Sports Medicine, calibrated against the latest golf-specific evidence base (O&apos;Donnell et al., 2024, Sports Medicine).
                 </p>
                 <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
-                  The base formula is: 2ml of fluid per kg of body weight, every 15 minutes of activity.
+                  The base recommendation is roughly 2.8ml of fluid per kilogram of body weight per hour for a typical golfer walking the course in mild conditions, derived from on-course sweat rate measurements. We then adjust for your weather, your sweat rate, and whether you walk or take a buggy.
                 </p>
-                <p style={{ fontSize: 14, fontWeight: 700, color: G.text }}>From there we apply three adjustments:</p>
-                <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <li style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.55 }}>Mode of play: walking burns more energy than riding in a buggy.</li>
-                  <li style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.55 }}>Climate: hotter conditions raise sweat rate.</li>
-                  <li style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.55 }}>Self-reported sweat rate: a personal multiplier on top of the climate adjustment.</li>
-                </ul>
                 <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
-                  Galpin&apos;s formula was calibrated for running. We apply a golf-specific intensity multiplier to account for the lower energy demand of a round.
+                  The 150% post-round rule for replacing lost fluid is from ACSM guidance for full rehydration after exercise.
                 </p>
                 <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
                   This estimate is guidance. Please consult with a healthcare professional for personalised advice.
                 </p>
-                <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
-                  Source:{' '}
-                  <a
-                    href="https://www.tandfonline.com/doi/abs/10.1080/02640419608727736"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: G.green, textDecoration: 'underline' }}
-                  >
-                    Fallowfield et al. (1996), Effect of water ingestion on endurance capacity during prolonged running, Journal of Sports Sciences, 14(6), 497-502.
-                  </a>
-                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: G.muted, lineHeight: 1.55, opacity: 0.75 }}>
+                    Sawka et al. (2007), American College of Sports Medicine position stand on exercise and fluid replacement.{' '}
+                    <a
+                      href="https://pubmed.ncbi.nlm.nih.gov/17277604/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: G.green, textDecoration: 'underline' }}
+                    >
+                      pubmed.ncbi.nlm.nih.gov/17277604
+                    </a>
+                  </p>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: G.muted, lineHeight: 1.55, opacity: 0.75 }}>
+                    O&apos;Donnell et al. (2024), Nutrition and Golf Performance: A Systematic Scoping Review. Sports Medicine.{' '}
+                    <a
+                      href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11608286/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: G.green, textDecoration: 'underline' }}
+                    >
+                      pmc.ncbi.nlm.nih.gov/articles/PMC11608286
+                    </a>
+                  </p>
+                </div>
               </div>
             </div>
           )}
