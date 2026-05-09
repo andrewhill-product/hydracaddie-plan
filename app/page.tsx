@@ -89,7 +89,7 @@ const [quizStartStep, setQuizStartStep] = useState(0) // which Q to return to if
           </h1>
 
           <p style={{ color: 'rgba(255,255,255,0.82)', fontSize: 15.5, lineHeight: 1.55, maxWidth: 320 }}>
-            Mild dehydration can cut your shot distance by around 11% and nearly double how far you miss by.
+            Mild dehydration can cut your shot distance by around 12% and nearly double how far you miss by.
           </p>
           <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.15)' }}>
             <p style={{ color: 'rgba(255,255,255,0.68)', fontSize: 13, lineHeight: 1.5, fontWeight: 600 }}>
