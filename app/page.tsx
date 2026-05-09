@@ -151,7 +151,7 @@ const [quizStartStep, setQuizStartStep] = useState(0) // which Q to return to if
             Start your plan
           </button>
           <p style={{ textAlign: 'center', fontSize: 12.5, color: G.muted, marginTop: 12, fontWeight: 600 }}>
-            Free. No account needed.
+            Free. Fuel your swing.
           </p>
         </div>
 

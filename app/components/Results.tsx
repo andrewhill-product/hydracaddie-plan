@@ -399,6 +399,17 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
                       pmc.ncbi.nlm.nih.gov/articles/PMC11608286
                     </a>
                   </p>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: G.muted, lineHeight: 1.55, opacity: 0.75 }}>
+                    Smith et al. (2012), Effect of acute mild dehydration on cognitive-motor performance in golf. Journal of Strength and Conditioning Research.{' '}
+                    <a
+                      href="https://pubmed.ncbi.nlm.nih.gov/22190159/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: G.green, textDecoration: 'underline' }}
+                    >
+                      pubmed.ncbi.nlm.nih.gov/22190159
+                    </a>
+                  </p>
                 </div>
               </div>
             </div>
