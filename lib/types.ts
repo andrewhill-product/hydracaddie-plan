@@ -21,12 +21,7 @@ export type WeightBucket =
   | '90-100'
   | 'over100'
 
-export type Handicap =
-  | 'under10'
-  | '10-18'
-  | '19-28'
-  | '28+'
-  | 'none'
+export type Handicap = number | 'none'
 
 // QuizAnswers holds everything the user tells us across all 7 questions.
 export interface QuizAnswers {

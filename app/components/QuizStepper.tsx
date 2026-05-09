@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import type {
   QuizAnswers, HolesPlayed, ModeOfPlay, RoundDuration,
-  Climate, SweatRate, WeightBucket, Handicap
+  Climate, SweatRate, WeightBucket
 } from '../../lib/types'
 
 const G = {
@@ -19,13 +19,6 @@ const G = {
 
 type PartialAnswers = Partial<QuizAnswers>
 
-// Maps the raw slider number to our Handicap type bucket
-function sliderToHandicap(value: number): Handicap {
-  if (value < 10)  return 'under10'
-  if (value <= 18) return '10-18'
-  if (value <= 28) return '19-28'
-  return '28+'
-}
 
 // Reusable option button with emoji
 function OptionButton({ emoji, label, onClick, isSelected }: {
@@ -350,7 +343,6 @@ export default function QuizStepper({
   // Q7: handicap slider
   if (step === 6) {
     const displayValue = sliderVal >= 30 ? '30+' : String(sliderVal)
-    const handicapBucket = sliderToHandicap(sliderVal)
 
     return (
       <QuestionScreen step={7} question="What's your handicap?" onBack={goBack}>
@@ -409,7 +401,7 @@ export default function QuizStepper({
 
         {/* Confirm button */}
         <button
-         onClick={() => { setAnswers(prev => ({ ...prev, handicap: handicapBucket })); onComplete(); }}
+         onClick={() => { setAnswers(prev => ({ ...prev, handicap: sliderVal })); onComplete(); }}
           style={{
             width: '100%',
             padding: '18px 20px',
