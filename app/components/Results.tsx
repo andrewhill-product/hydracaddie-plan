@@ -114,8 +114,8 @@ function buildCheckpoints18(totalFluidMl: number, answers: QuizAnswers): Checkpo
       emoji:    '🏆',
       label:    'Post-round',
       subtitle: 'After the 18th',
-      action:   `${postRoundMl}ml plain water in the clubhouse`,
-      body:     `Sports science recommends replacing 150% of fluid lost after exercise to fully rehydrate. Based on your estimated sweat loss of ${totalFluidMl}ml, aim for ${postRoundMl}ml before you head home.`,
+      action:   `${postRoundMl}ml to recover`,
+      body:     `For optimal recovery, sports science recommends replacing 150% of fluid lost after exercise. Based on your estimated sweat loss of ${totalFluidMl}ml, aim for ${postRoundMl}ml of plain water.`,
     },
   ]
 }
@@ -142,8 +142,8 @@ function buildCheckpoints9(totalFluidMl: number): Checkpoint[] {
       emoji:    '🏆',
       label:    'Post-round',
       subtitle: 'After the 9th',
-      action:   `${postRoundMl}ml plain water in the clubhouse`,
-      body:     `Sports science recommends replacing 150% of fluid lost after exercise to fully rehydrate. Based on your estimated sweat loss of ${totalFluidMl}ml, aim for ${postRoundMl}ml before you head home.`,
+      action:   `${postRoundMl}ml to recover`,
+      body:     `For optimal recovery, sports science recommends replacing 150% of fluid lost after exercise. Based on your estimated sweat loss of ${totalFluidMl}ml, aim for ${postRoundMl}ml of plain water.`,
     },
   ]
 }
