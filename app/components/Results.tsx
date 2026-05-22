@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import type { QuizAnswers } from '../../lib/types'
-import { calculateHydrationPlan } from '../../lib/calculateHydrationPlan'
+import { calculateHydrationPlan, getCalcBreakdown } from '../../lib/calculateHydrationPlan'
 
 const G = {
   green:      '#1A7A3C',
@@ -17,21 +17,11 @@ const G = {
   border:     '#E2E8E4',
 }
 
-// Human-readable labels for the YOUR CALCULATION summary table.
-// Lookup tables mean adding a new answer option = one line here, nothing else.
-const HOLES_LABEL: Record<number, string> = {
-  9:  '9 holes',
-  18: '18 holes',
-}
+// Human-readable labels used in the "How we calculated this" inputs section.
+// Adding a new answer option = one line here, nothing else.
 const MODE_LABEL: Record<string, string> = {
   walking: 'Walking',
   buggy:   'Buggy',
-}
-const DURATION_LABEL: Record<string, string> = {
-  '3h':       'Around 3 hours',
-  '4h':       'Around 4 hours',
-  '5h+':      '5 hours or more',
-  'not-sure': 'Not sure (average used)',
 }
 const CLIMATE_LABEL: Record<string, string> = {
   '0-10':  '0-10°C',
@@ -39,20 +29,6 @@ const CLIMATE_LABEL: Record<string, string> = {
   '16-20': '16-20°C',
   '21-25': '21-25°C',
   '26+':   '26°C+',
-}
-const SWEAT_LABEL: Record<string, string> = {
-  low:    'Barely break a sweat',
-  shower: "I'll need a shower after",
-  medium: 'Damp shirt by the back nine',
-  high:   'Soaked through, often',
-}
-const WEIGHT_LABEL: Record<string, string> = {
-  'under60': '60kg or below',
-  '60-70':   '60-70kg',
-  '70-80':   '70-80kg',
-  '80-90':   '80-90kg',
-  '90-100':  '90-100kg',
-  'over100': 'Over 100kg',
 }
 
 type Checkpoint = {
@@ -133,7 +109,8 @@ const PRODUCT_URL = 'https://www.hydracaddie.com/collections/electrolyte-powder?
 
 export default function Results({ answers }: { answers: QuizAnswers }) {
 
-  const plan = useMemo(() => calculateHydrationPlan(answers), [answers])
+  const plan      = useMemo(() => calculateHydrationPlan(answers), [answers])
+  const breakdown = useMemo(() => getCalcBreakdown(answers), [answers])
   const totalFormatted = Intl.NumberFormat('en-GB').format(plan.totalFluidMl)
   const checkpoints = answers.holes === 9 ? buildCheckpoints9(plan.totalFluidMl) : buildCheckpoints18(plan.totalFluidMl)
 
@@ -315,82 +292,90 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
           </button>
 
           {calcOpen && (
-            <div style={{ borderTop: `1px solid ${G.border}`, maxHeight: 480, overflowY: 'auto' }}>
+            <div style={{ borderTop: `1px solid ${G.border}` }}>
 
-              {/* YOUR CALCULATION summary table */}
-              <div style={{ background: G.greenLight, padding: '20px 24px', marginBottom: 0 }}>
+              {/* YOUR INPUTS */}
+              <div style={{ background: G.greenLight, padding: '20px 24px' }}>
                 <p style={{ fontSize: 12, fontWeight: 800, color: G.green, letterSpacing: 1.2, marginBottom: 16 }}>
-                  YOUR CALCULATION
+                  YOUR INPUTS
                 </p>
                 {[
-                  { label: 'Round',      value: HOLES_LABEL[answers.holes]     },
-                  { label: 'Mode',       value: MODE_LABEL[answers.mode]       },
-                  { label: 'Duration',   value: DURATION_LABEL[answers.duration] },
-                  { label: 'Climate',    value: CLIMATE_LABEL[answers.climate]  },
-                  { label: 'Sweat rate', value: SWEAT_LABEL[answers.sweat]     },
-                  { label: 'Weight',     value: WEIGHT_LABEL[answers.weight]   },
+                  { label: 'Body weight',        value: `${breakdown.weightKg}kg`              },
+                  { label: 'Round type',          value: MODE_LABEL[answers.mode]               },
+                  { label: 'Weather conditions',  value: CLIMATE_LABEL[answers.climate]         },
+                  { label: 'Round duration',      value: `${breakdown.hours} hours`             },
                 ].map(({ label, value }) => (
                   <div key={label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                     <span style={{ fontSize: 14, fontWeight: 600, color: G.muted }}>{label}</span>
                     <span style={{ fontSize: 14, fontWeight: 800, color: G.text }}>{value}</span>
                   </div>
                 ))}
-                <div style={{ height: 1, background: G.border, margin: '12px 0' }} />
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: G.green }}>Total fluid</span>
-                  <span style={{ fontSize: 15, fontWeight: 900, color: G.green }}>{totalFormatted}ml</span>
-                </div>
               </div>
 
-              {/* How we calculated this explanation */}
-              <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
-                  Your plan is built on hydration guidelines from the American College of Sports Medicine, calibrated against the latest golf-specific evidence base (O&apos;Donnell et al., 2024, Sports Medicine).
+              {/* THE CALCULATION */}
+              <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <p style={{ fontSize: 12, fontWeight: 800, color: G.green, letterSpacing: 1.2 }}>
+                  THE CALCULATION
                 </p>
-                <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
-                  The base recommendation is roughly 2.8ml of fluid per kilogram of body weight per hour for a typical golfer walking the course in mild conditions, derived from on-course sweat rate measurements. We then adjust for your weather, your sweat rate, and whether you walk or take a buggy.
-                </p>
-                <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
-                  The 150% post-round rule for replacing lost fluid is from ACSM guidance for full rehydration after exercise.
-                </p>
-                <p style={{ fontSize: 14, fontWeight: 600, color: G.muted, lineHeight: 1.6 }}>
-                  This estimate is guidance. Please consult with a healthcare professional for personalised advice.
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: G.muted, lineHeight: 1.55, opacity: 0.75 }}>
-                    Sawka et al. (2007), American College of Sports Medicine position stand on exercise and fluid replacement.{' '}
-                    <a
-                      href="https://pubmed.ncbi.nlm.nih.gov/17277604/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: G.green, textDecoration: 'underline' }}
-                    >
-                      pubmed.ncbi.nlm.nih.gov/17277604
-                    </a>
+
+                {/* Step 1 */}
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 800, color: G.green, letterSpacing: 1, marginBottom: 6 }}>
+                    STEP 1 — BASE HYDRATION RATE
                   </p>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: G.muted, lineHeight: 1.55, opacity: 0.75 }}>
-                    O&apos;Donnell et al. (2024), Nutrition and Golf Performance: A Systematic Scoping Review. Sports Medicine.{' '}
-                    <a
-                      href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11608286/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: G.green, textDecoration: 'underline' }}
-                    >
-                      pmc.ncbi.nlm.nih.gov/articles/PMC11608286
-                    </a>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: G.muted, marginBottom: 8 }}>
+                    Base rate for a {answers.mode} round
                   </p>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: G.muted, lineHeight: 1.55, opacity: 0.75 }}>
-                    Smith et al. (2012), Effect of acute mild dehydration on cognitive-motor performance in golf. Journal of Strength and Conditioning Research.{' '}
-                    <a
-                      href="https://pubmed.ncbi.nlm.nih.gov/22190159/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: G.green, textDecoration: 'underline' }}
-                    >
-                      pubmed.ncbi.nlm.nih.gov/22190159
-                    </a>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: G.muted }}>
+                    <span style={{ fontWeight: 800, color: G.text }}>{breakdown.weightKg}kg</span>
+                    {' x '}
+                    <span style={{ fontWeight: 800, color: G.text }}>{breakdown.baseRate}ml/kg/hr</span>
+                    {' = '}
+                    <span style={{ fontWeight: 800, color: G.green }}>{breakdown.step1}ml per hour</span>
                   </p>
                 </div>
+
+                <div style={{ height: 1, background: G.border }} />
+
+                {/* Step 2 */}
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 800, color: G.green, letterSpacing: 1, marginBottom: 6 }}>
+                    STEP 2 — CLIMATE ADJUSTMENT
+                  </p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: G.muted, marginBottom: 8 }}>
+                    {CLIMATE_LABEL[answers.climate]} conditions (x{breakdown.climateMult} adjustment)
+                  </p>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: G.muted }}>
+                    <span style={{ fontWeight: 800, color: G.text }}>{breakdown.step1}ml/hr</span>
+                    {' x '}
+                    <span style={{ fontWeight: 800, color: G.text }}>{breakdown.climateMult}</span>
+                    {' = '}
+                    <span style={{ fontWeight: 800, color: G.green }}>{breakdown.step2}ml per hour</span>
+                  </p>
+                </div>
+
+                <div style={{ height: 1, background: G.border }} />
+
+                {/* Step 3 */}
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 800, color: G.green, letterSpacing: 1, marginBottom: 6 }}>
+                    STEP 3 — YOUR ROUND TOTAL
+                  </p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: G.muted, marginBottom: 8 }}>
+                    Total fluid for your {breakdown.hours}-hour round
+                  </p>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: G.muted }}>
+                    <span style={{ fontWeight: 800, color: G.text }}>{breakdown.step2}ml/hr</span>
+                    {' x '}
+                    <span style={{ fontWeight: 800, color: G.text }}>{breakdown.hours}hrs</span>
+                    {' = '}
+                    <span style={{ fontWeight: 800, color: G.green }}>{totalFormatted}ml</span>
+                  </p>
+                </div>
+
+                <p style={{ fontSize: 12, fontWeight: 600, color: G.muted, lineHeight: 1.55, opacity: 0.75 }}>
+                  Recommendations based on established sports science guidelines for exercise hydration.
+                </p>
               </div>
             </div>
           )}

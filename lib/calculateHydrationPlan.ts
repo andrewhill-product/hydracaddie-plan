@@ -62,6 +62,31 @@ function roundToNearest50(ml: number): number {
 }
 
 // -------------------------------------------------------------------
+// BREAKDOWN (for the results page step-by-step display)
+// -------------------------------------------------------------------
+
+export interface CalcBreakdown {
+  weightKg: number      // weight bucket midpoint in kg
+  baseRate: number      // ml/kg/hr baseline (walking or buggy)
+  climateMult: number   // climate band multiplier
+  hours: number         // round duration in hours
+  step1: number         // weightKg x baseRate, rounded to whole number (ml/hr before climate)
+  step2: number         // step1 x climateMult, rounded to whole number (ml/hr after climate)
+}
+
+export function getCalcBreakdown(answers: QuizAnswers): CalcBreakdown {
+  const weightKg = WEIGHT_MIDPOINTS[answers.weight]
+  const rawDuration = DURATION_MINUTES[answers.duration]
+  const durationMinutes = rawDuration !== null ? rawDuration : DEFAULT_DURATION_BY_HOLES[answers.holes]
+  const hours = durationMinutes / 60
+  const baseRate = BASELINE_ML_PER_KG_PER_HOUR[answers.mode]
+  const climateMult = CLIMATE[answers.climate]
+  const step1 = Math.round(weightKg * baseRate)
+  const step2 = Math.round(step1 * climateMult)
+  return { weightKg, baseRate, climateMult, hours, step1, step2 }
+}
+
+// -------------------------------------------------------------------
 // MAIN FUNCTION
 // -------------------------------------------------------------------
 
