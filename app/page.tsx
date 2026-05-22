@@ -11,7 +11,7 @@ import type { QuizAnswers } from '../lib/types'
 type PartialAnswers = Partial<QuizAnswers>
 
 // The screens the tool can show, in order
-type Step = 'landing' | 'disclaimer' | 'quiz' | 'email' | 'results'
+type Step = 'landing' | 'quiz' | 'email' | 'results'
 
 const G = {
   green:      '#1A7A3C',
@@ -53,97 +53,6 @@ export default function Home() {
     )
   }
 
-  // Show disclaimer before the quiz begins
-  if (step === 'disclaimer') {
-    return (
-      <div style={{ maxWidth: 430, margin: '0 auto', minHeight: '100vh', background: G.white }}>
-
-        {/* Header: back arrow + logo */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '20px 20px 0',
-        }}>
-          <button
-            onClick={() => setStep('landing')}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: G.text, padding: 4 }}
-          >
-            ←
-          </button>
-          <div />
-          <Image
-            src="/hydracaddie-logo.png"
-            alt="Hydracaddie"
-            width={90}
-            height={22}
-            style={{ objectFit: 'contain' }}
-          />
-        </div>
-
-        {/* Progress bar at 0% */}
-        <div style={{ height: 3, background: G.border, marginTop: 16 }}>
-          <div style={{ height: 3, width: '0%', background: G.green, borderRadius: 2 }} />
-        </div>
-
-        {/* Content */}
-        <div style={{ padding: '36px 24px 40px' }}>
-          <h2 style={{ fontSize: 26, fontWeight: 900, color: G.text, lineHeight: 1.2, marginBottom: 24 }}>
-            Before we start
-          </h2>
-          <p style={{ fontSize: 15, fontWeight: 600, color: G.muted, lineHeight: 1.6, marginBottom: 32 }}>
-            This tool provides general hydration guidance for golf. It does not constitute formal medical diagnosis or treatment. We advise all users to consult their GP or a qualified healthcare professional if they have specific health concerns.
-          </p>
-
-          {/* Checkbox */}
-          <label style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 14,
-            padding: '16px 20px',
-            borderRadius: 14,
-            border: `2px solid ${disclaimerChecked ? G.green : G.border}`,
-            background: disclaimerChecked ? G.greenLight : G.white,
-            cursor: 'pointer',
-            marginBottom: 24,
-          }}>
-            <input
-              type="checkbox"
-              checked={disclaimerChecked}
-              onChange={e => setDisclaimerChecked(e.target.checked)}
-              style={{ marginTop: 2, accentColor: G.green, width: 18, height: 18, flexShrink: 0 }}
-            />
-            <span style={{ fontSize: 15, fontWeight: 700, color: G.text, lineHeight: 1.4 }}>
-              I understand this is general guidance and is not a substitute for listening to my own body.
-            </span>
-          </label>
-
-          {/* Continue button, greyed out until checkbox is ticked */}
-          <button
-            onClick={() => { if (disclaimerChecked) setStep('quiz') }}
-            disabled={!disclaimerChecked}
-            style={{
-              display: 'block',
-              width: '100%',
-              border: 'none',
-              cursor: disclaimerChecked ? 'pointer' : 'not-allowed',
-              fontFamily: 'Nunito, sans-serif',
-              fontWeight: 800,
-              fontSize: 18,
-              borderRadius: 50,
-              padding: '16px 24px',
-              background: disclaimerChecked ? G.green : G.border,
-              color: disclaimerChecked ? '#fff' : G.muted,
-              transition: 'background 0.2s ease, color 0.2s ease',
-            }}
-          >
-            Continue
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   // Show quiz once started
   if (step === 'quiz') {
     return <QuizStepper answers={answers} setAnswers={setAnswers} onComplete={() => setStep('email')} initialStep={quizStartStep} />
@@ -155,7 +64,7 @@ export default function Home() {
 
       <div style={{
         background: `linear-gradient(170deg, ${G.greenDark} 0%, ${G.green} 60%, ${G.greenMid} 100%)`,
-        padding: '32px 28px 36px',
+        padding: '20px 28px 24px',
         position: 'relative',
         overflow: 'hidden',
       }}>
@@ -165,7 +74,7 @@ export default function Home() {
 
         <div style={{ position: 'relative', zIndex: 1 }}>
 
-          <div style={{ marginBottom: 20 }}>
+          <div style={{ marginBottom: 12 }}>
             <Image
               src='/hydracaddie-logo.png'
               alt='Hydracaddie'
@@ -181,12 +90,12 @@ export default function Home() {
           </h1>
 
           <p style={{ color: 'rgba(255,255,255,0.82)', fontSize: 15.5, lineHeight: 1.55, maxWidth: 320 }}>
-            Use this tool to help your performance when out on the golf course. Find out exactly how much to drink and when.
+            Use this tool to help your performance when out on the golf course.
           </p>
         </div>
       </div>
 
-      <div style={{ padding: '20px 28px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ padding: '14px 28px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ display: 'flex' }}>
@@ -224,15 +133,39 @@ export default function Home() {
         </div>
 
         <div>
-          {/* Clicking Start moves us to the disclaimer screen before the quiz begins */}
+          <p style={{ fontSize: 11.5, color: G.muted, marginBottom: 10, lineHeight: 1.5, opacity: 0.75 }}>
+            Disclaimer: This tool provides general hydration guidance for golf. It does not constitute formal medical diagnosis or treatment. Consult your GP if you have specific health concerns.
+          </p>
+
+          {/* Checkbox gate — button stays disabled until ticked */}
+          <label style={{
+            display: 'flex', alignItems: 'flex-start', gap: 10,
+            cursor: 'pointer', marginBottom: 16,
+          }}>
+            <input
+              type="checkbox"
+              checked={disclaimerChecked}
+              onChange={e => setDisclaimerChecked(e.target.checked)}
+              style={{ marginTop: 2, accentColor: G.green, width: 16, height: 16, flexShrink: 0 }}
+            />
+            <span style={{ fontSize: 12, fontWeight: 600, color: G.muted, lineHeight: 1.5 }}>
+              By ticking this box, I understand this tool provides general guidance only and is not a substitute for medical advice.
+            </span>
+          </label>
+
+          {/* Clicking Start moves us from landing to quiz */}
           <button
-            onClick={() => { setDisclaimerChecked(false); setStep('disclaimer') }}
+            onClick={() => { if (disclaimerChecked) setStep('quiz') }}
+            disabled={!disclaimerChecked}
             style={{
               display: 'block', width: '100%', border: 'none',
-              cursor: 'pointer', fontFamily: 'Nunito, sans-serif',
+              cursor: disclaimerChecked ? 'pointer' : 'not-allowed',
+              fontFamily: 'Nunito, sans-serif',
               fontWeight: 800, fontSize: 18,
               borderRadius: 50, padding: '16px 24px',
-              background: G.green, color: '#fff',
+              background: disclaimerChecked ? G.green : G.border,
+              color: disclaimerChecked ? '#fff' : G.muted,
+              transition: 'background 0.2s ease, color 0.2s ease',
             }}
           >
             Start your plan
