@@ -63,29 +63,9 @@ type Checkpoint = {
   body: string
 }
 
-// Front 9 body copy varies by climate: hotter = more urgency, cooler = reassurance.
-const FRONT9_BODY: Record<string, string> = {
-  '0-10':  'Cool conditions slow your sweat rate, but you are still losing fluid. Sip every 3 holes to stay on top of it.',
-  '11-15': 'Sip your sachet every 2-3 holes, topping up with plain water as needed. Steady sipping beats big gulps for absorption.',
-  '16-20': 'Sip your sachet every 2-3 holes, topping up with plain water as needed. Steady sipping beats big gulps for absorption.',
-  '21-25': 'Warm conditions mean your sweat rate is higher than it feels. Sip every 2-3 holes and get ahead of your thirst, not behind it.',
-  '26+':   "Hot day. You are losing fluid faster than normal. Sip every 2 holes and do not wait for thirst. By the time you feel it, you are already behind.",
-}
-
-// Back 9 body copy varies by sweat rate: heavy sweaters need the fade warning.
-const BACK9_BODY: Record<string, string> = {
-  'low':    'Your sweat rate is low so your fluid balance should be holding up well. Keep sipping every few holes to stay comfortable through to 18.',
-  'shower': 'Sip every 2-3 holes. The electrolytes from your sachet will keep working through the back nine.',
-  'medium': 'Sip every 2-3 holes. The electrolytes from your sachet will keep working through the back nine.',
-  'high':   'You lose fluid quickly, so the back nine is where most golfers start to fade. Keep sipping even when you feel fine. Your sachet electrolytes are still active.',
-}
-
-// Splits the calc total evenly across Front 9 and Back 9 so they sum to totalFluidMl.
-// Front 9 is rounded to nearest 50ml; Back 9 takes the remainder to preserve the total.
-// Post-round uses the 150% rehydration rule: replace 1.5x sweat loss after exercise.
-function buildCheckpoints18(totalFluidMl: number, answers: QuizAnswers): Checkpoint[] {
+// Post-round uses the 150% rehydration rule: replace 1.5x fluid needs after exercise.
+function buildCheckpoints18(totalFluidMl: number): Checkpoint[] {
   const front9Ml    = Math.round(totalFluidMl / 2 / 50) * 50
-  const back9Ml     = totalFluidMl - front9Ml
   const postRoundMl = Math.round(totalFluidMl * 1.5 / 50) * 50
 
   return [
@@ -94,28 +74,28 @@ function buildCheckpoints18(totalFluidMl: number, answers: QuizAnswers): Checkpo
       label:    'Pre-round',
       subtitle: 'Before the first tee',
       action:   'Mix one sachet in 500ml water',
-      body:     'Start sipping 2 hours before your tee time, not on the first tee. Drink half your sachet in the build-up to your round and save the rest for the front nine. Getting ahead of your fluid needs before hole one is the easiest win in golf hydration.',
+      body:     'Make sure your body is hydrated before you reach the first tee. We recommend having a sachet of electrolytes in the build-up to your round. Start sipping 2 hours before your tee time. Getting ahead of your fluid needs before hole one is the easiest win in golf hydration.',
     },
     {
       emoji:    '⛳',
       label:    'Front 9',
       subtitle: 'Holes 1 to 9',
       action:   `Aim for ${front9Ml}ml by the turn`,
-      body:     FRONT9_BODY[answers.climate],
+      body:     `Based on your recommended total of ${totalFluidMl}ml, aim to consume half by the turn. Sip every 2-3 holes, topping up with plain water as needed. Steady sipping beats big gulps for absorption.`,
     },
     {
       emoji:    '⛳',
       label:    'Back 9',
       subtitle: 'Holes 10 to 18',
-      action:   `Top up with ${back9Ml}ml of plain water`,
-      body:     BACK9_BODY[answers.sweat],
+      action:   `Aim for ${totalFluidMl}ml by the 18th`,
+      body:     `Aim to consume your full ${totalFluidMl}ml by the end of the round. The electrolytes from your sachet will keep working through the back nine. Top up with plain water between holes.`,
     },
     {
       emoji:    '🏆',
       label:    'Post-round',
       subtitle: 'After the 18th',
       action:   `${postRoundMl}ml to recover`,
-      body:     `For optimal recovery, sports science recommends replacing 150% of fluid lost after exercise. Based on your estimated sweat loss of ${totalFluidMl}ml, aim for ${postRoundMl}ml of plain water.`,
+      body:     `Recovery starts with giving your body the right fluids. Based on your estimated fluid needs of ${totalFluidMl}ml, aim for ${postRoundMl}ml after your round to recover properly. If post-round drinks are happening, rehydrate with water first.`,
     },
   ]
 }
@@ -129,7 +109,7 @@ function buildCheckpoints9(totalFluidMl: number): Checkpoint[] {
       label:    'Pre-round',
       subtitle: 'Before the first tee',
       action:   'Mix one sachet in 500ml water',
-      body:     'Start sipping 2 hours before your tee time. Drink half your sachet in the build-up and save the rest for the course.',
+      body:     'Make sure your body is hydrated before you reach the first tee. We recommend having a sachet of electrolytes in the build-up to your round. Start sipping 2 hours before your tee time. Getting ahead of your fluid needs before hole one is the easiest win in golf hydration.',
     },
     {
       emoji:    '⛳',
@@ -143,7 +123,7 @@ function buildCheckpoints9(totalFluidMl: number): Checkpoint[] {
       label:    'Post-round',
       subtitle: 'After the 9th',
       action:   `${postRoundMl}ml to recover`,
-      body:     `For optimal recovery, sports science recommends replacing 150% of fluid lost after exercise. Based on your estimated sweat loss of ${totalFluidMl}ml, aim for ${postRoundMl}ml of plain water.`,
+      body:     `Recovery starts with giving your body the right fluids. Based on your estimated fluid needs of ${totalFluidMl}ml, aim for ${postRoundMl}ml after your round to recover properly. If post-round drinks are happening, rehydrate with water first.`,
     },
   ]
 }
@@ -155,7 +135,7 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
 
   const plan = useMemo(() => calculateHydrationPlan(answers), [answers])
   const totalFormatted = Intl.NumberFormat('en-GB').format(plan.totalFluidMl)
-  const checkpoints = answers.holes === 9 ? buildCheckpoints9(plan.totalFluidMl) : buildCheckpoints18(plan.totalFluidMl, answers)
+  const checkpoints = answers.holes === 9 ? buildCheckpoints9(plan.totalFluidMl) : buildCheckpoints18(plan.totalFluidMl)
 
   // Both accordions closed by default.
   const [timelineOpen, setTimelineOpen] = useState(false)
@@ -181,7 +161,7 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
             style={{ filter: 'brightness(0) invert(1)', opacity: 0.9, marginBottom: 28 }}
           />
           <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.65)', letterSpacing: 1.5, marginBottom: 10 }}>
-            YOUR ROUND HYDRATION PLAN
+            YOUR FAIRWAY HYDRATION PLAN
           </p>
           <h1 style={{ fontSize: 30, fontWeight: 900, color: G.white, lineHeight: 1.2, margin: 0 }}>
             You&apos;ll need a solid drink strategy.
@@ -207,7 +187,7 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
             <span style={{ fontSize: 22, fontWeight: 700, marginLeft: 4 }}>ml</span>
           </p>
           <p style={{ fontSize: 13, fontWeight: 600, color: G.muted, lineHeight: 1.5, marginTop: 12 }}>
-            Your estimated sweat loss during the round. Your full drinking plan is below.
+            Your estimated fluid needs during the round. Your full drinking plan is below.
           </p>
         </div>
 
@@ -232,7 +212,7 @@ export default function Results({ answers }: { answers: QuizAnswers }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 20 }}>⛳</span>
               <span style={{ fontSize: 15, fontWeight: 800, color: G.white, textAlign: 'left' }}>
-                See the optimal hydration for your round
+                Your suggested hydration schedule
               </span>
             </div>
             {timelineOpen
