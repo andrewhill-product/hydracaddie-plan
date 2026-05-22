@@ -129,11 +129,14 @@ export default function EmailCapture({ answers, onSuccess, onBack }: Props) {
             </span>
           </label>
 
-          <p style={{ fontSize: 13, color: G.muted, marginBottom: 32, paddingLeft: 36 }}>
+          <p style={{ fontSize: 13, color: G.muted, marginBottom: 8, paddingLeft: 36 }}>
             By ticking, you agree to our{' '}
             <a href="https://www.hydracaddie.com/policies/privacy-policy" style={{ color: G.green, textDecoration: 'underline' }}>Privacy Policy</a>
             {' '}and{' '}
             <a href="https://www.hydracaddie.com/policies/terms-of-service" style={{ color: G.green, textDecoration: 'underline' }}>Terms of Service</a>.
+          </p>
+          <p style={{ fontSize: 12, color: G.muted, marginBottom: 32, paddingLeft: 36, opacity: 0.8 }}>
+            By signing up, you agree to receive marketing emails from Hydracaddie. You can unsubscribe at any time.
           </p>
 
           {/* Submit button — grey until both email and consent are valid */}
