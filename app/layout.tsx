@@ -9,12 +9,12 @@ const nunito = Nunito({
 
 export const metadata: Metadata = {
   // Browser tab title
-  title: "Your personal round hydration plan | Hydracaddie",
-  description: "Personalised round hydration plan for golfers. Built on the Galpin equation.",
+  title: "Your Fairway Hydration Plan | Hydracaddie",
+  description: "Personalised hydration plan for golfers. Find out exactly how much to drink and when, based on sports science guidelines.",
   openGraph: {
     // What shows when someone shares the link on WhatsApp, Twitter, LinkedIn etc.
-    title: "Your personal round hydration plan",
-    description: "Personalised round hydration plan for golfers. Built on the Galpin equation.",
+    title: "Your Fairway Hydration Plan | Hydracaddie",
+    description: "Personalised hydration plan for golfers. Find out exactly how much to drink and when, based on sports science guidelines.",
     url: "https://hydracaddie-plan.vercel.app",
     siteName: "Hydracaddie",
     images: [{ url: "/hydracaddie-logo.png", width: 260, height: 60 }],
@@ -23,8 +23,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Your personal round hydration plan",
-    description: "Personalised round hydration plan for golfers. Built on the Galpin equation.",
+    title: "Your Fairway Hydration Plan | Hydracaddie",
+    description: "Personalised hydration plan for golfers. Find out exactly how much to drink and when, based on sports science guidelines.",
     images: ["/hydracaddie-logo.png"],
   },
 };
